@@ -7,7 +7,7 @@
 - Context Actions
 - Automation engine
 - Multi-provider AI in the Mac app, including any OpenAI-compatible server and Ollama
-- Live island: music, meetings, timers, downloads, agents and system events
+- Live island: music, calls with their controls, volume and headphones, meetings, timers, downloads, agents and system events
 - Command bar, clipboard history and Shelf
 - Window management, the app switcher and per-app audio
 - Browser extension for the notch and page tools
