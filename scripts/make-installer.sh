@@ -10,7 +10,10 @@ fi
 VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' Info.plist)"
 APP="$PWD/dist/SAVISUL.app"
 STAGE="$PWD/.build/dmg-root"
-RW="$PWD/.build/savisul-rw.dmg"
+# Finder writes the path of this image into the DMG's window layout, so it is
+# made outside the home folder, whose name is the builder's account name.
+RW_DIR="$(mktemp -d /tmp/savisul-dmg.XXXXXX)"
+RW="$RW_DIR/savisul-rw.dmg"
 DMG="$PWD/dist/SAVISUL-$VERSION.dmg"
 MOUNT="/Volumes/SAVISUL"
 BACKGROUND="$PWD/.build/dmg-background.png"
@@ -94,6 +97,7 @@ sync
 hdiutil detach "$MOUNT" >/dev/null
 hdiutil convert "$RW" -format UDZO -imagekey zlib-level=9 -o "$DMG" >/dev/null
 rm -f "$RW"
+rmdir "$RW_DIR"
 
 # A zip made this way keeps the executable bit. Packing the folder in Telegram does not,
 # and macOS then reports that the app can't be opened.
