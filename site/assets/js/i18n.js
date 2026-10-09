@@ -441,6 +441,8 @@ const STRINGS = {
     copied: 'Copied',
     readLicense: 'Read the license',
     viewGithub: 'View on GitHub',
+    reportBug: 'Report a bug',
+    openContribute: 'Found a bug or have a fix? Open an issue or a pull request on GitHub. Every change is reviewed before it ships.',
 
     finalTitle: 'Put your notch to work.',
     finalZip: 'ZIP archive',
@@ -892,6 +894,8 @@ const STRINGS = {
     copied: 'Скопировано',
     readLicense: 'Читать лицензию',
     viewGithub: 'Открыть на GitHub',
+    reportBug: 'Сообщить об ошибке',
+    openContribute: 'Нашли ошибку или знаете, как её исправить? Откройте issue или pull request на GitHub. Каждое изменение проверяется перед выпуском.',
 
     finalTitle: 'Пусть вырез работает.',
     finalZip: 'Архив ZIP',

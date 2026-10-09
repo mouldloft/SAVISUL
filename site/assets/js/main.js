@@ -62,8 +62,10 @@ function wire(desktop) {
   for (const a of document.querySelectorAll('[data-dmg]')) a.href = CONFIG.dmg;
   for (const a of document.querySelectorAll('[data-zip]')) a.href = CONFIG.zip;
   for (const a of document.querySelectorAll('[data-mail]')) { a.href = `mailto:${CONFIG.email}`; if (a.dataset.mail === 'text') a.textContent = CONFIG.email; }
-  for (const a of document.querySelectorAll('[data-github]')) {
-    if (CONFIG.github) { a.href = CONFIG.github; a.hidden = false; } else a.hidden = true;
+  // Everything marked data-github shows only once the repository is set. data-github="issues" opens a new issue.
+  for (const el of document.querySelectorAll('[data-github]')) {
+    el.hidden = !CONFIG.github;
+    if (CONFIG.github && el instanceof HTMLAnchorElement) el.href = CONFIG.github + (el.dataset.github === 'issues' ? '/issues/new/choose' : '');
   }
   for (const a of document.querySelectorAll('[data-dmg]')) a.addEventListener('click', () => bus.emit('peek', 'download', CONFIG.version));
 

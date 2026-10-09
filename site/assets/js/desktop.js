@@ -385,6 +385,7 @@ export function createDesktop(root, bus) {
     ]));
     const status = h('button', { class: 'status-item status-savisul', type: 'button', 'aria-label': t('menuPanel'), title: `${t('menuPanel')} ⌃⌥S`, onclick: () => togglePanel() }, mark(18));
     const search = h('button', { class: 'status-item', type: 'button', 'aria-label': t('menuSearch'), title: `${t('menuSearch')} ⌥Space`, onclick: () => overlays.openCommand() }, icon('search', 15));
+    const github = CONFIG.github ? h('a', { class: 'status-item', href: CONFIG.github, target: '_blank', rel: 'noopener', 'aria-label': t('menuGithub'), title: t('menuGithub') }, icon('github', 15)) : null;
     clear(menubar).append(
       h('div', { class: 'menu-left' },
         h('div', { class: 'menu-wrap' }, appTrigger),
@@ -394,7 +395,7 @@ export function createDesktop(root, bus) {
         h('a', { class: 'menu-link', href: '#open-source', text: t('menuOpen') }),
         h('a', { class: 'menu-link', href: '#download', text: t('menuDownload') })),
       h('div', { class: 'menu-right' },
-        status, search,
+        github, status, search,
         h('div', { class: 'menu-wrap' }, langTrigger),
         h('span', { class: 'status-item static', 'aria-hidden': 'true' }, icon('wifi', 15)),
         h('span', { class: 'status-item static battery-item', 'aria-hidden': 'true' }, h('span', { text: '82%' }), icon('battery', 19)),

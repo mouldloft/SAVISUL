@@ -369,6 +369,7 @@ main { position: relative; background: var(--ground); }
 }
 .credit figcaption { font-size: 13px; color: var(--ink-3); font-weight: 600; }
 .credit code { font-size: 16px; color: var(--champagne-hi); overflow-wrap: anywhere; }
+.open-note { margin-bottom: 18px; color: var(--ink-2); max-width: 64ch; }
 .open-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 
 /* MARK: Final call */
