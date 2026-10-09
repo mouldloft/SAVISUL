@@ -1,0 +1,22 @@
+SAVISUL
+Copyright 2026 The SAVISUL Authors
+
+This product includes software developed by The SAVISUL Authors.
+
+Based on SAVISUL by The SAVISUL Authors · Apache License 2.0
+
+If you redistribute SAVISUL or a work derived from it, in source or binary
+form and including in commercial products, keep this NOTICE file and show
+the line above wherever your product displays third-party notices, such as
+an About window, a credits screen or its documentation (Apache License 2.0,
+section 4(d)).
+
+The SAVISUL name and logo are not licensed under the Apache License
+(section 6). Products based on SAVISUL must use their own name and logo.
+
+Third-party software in this repository:
+
+- Geologica and Onest fonts (site/assets/fonts)
+  SIL Open Font License 1.1, Copyright 2020 The Geologisk Project Authors
+  and Copyright 2021 The Onest Project Authors.
+  See site/assets/fonts/OFL-Geologica.txt and OFL-Onest.txt.

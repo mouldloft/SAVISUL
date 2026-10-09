@@ -1,0 +1,44 @@
+{
+  "extName": {
+    "message": "SAVISUL"
+  },
+  "extDescription": {
+    "message": "Виріз угорі кожної сторінки: читання, піпетка, лінійка, нотатки, темна тема, скриншоти всієї сторінки й керування Mac із SAVISUL."
+  },
+  "actionTitle": {
+    "message": "SAVISUL — відкрити виріз"
+  },
+  "cmdToggle": {
+    "message": "Відкрити або закрити виріз"
+  },
+  "cmdReader": {
+    "message": "Режим читання"
+  },
+  "cmdScreenshot": {
+    "message": "Скриншот усієї сторінки"
+  },
+  "cmdDark": {
+    "message": "Темна тема на цьому сайті"
+  },
+  "cmdColor": {
+    "message": "Піпетка"
+  },
+  "cmdRuler": {
+    "message": "Лінійка"
+  },
+  "cmdNotes": {
+    "message": "Нотатка до сторінки"
+  },
+  "cmdZapper": {
+    "message": "Сховати елементи"
+  },
+  "cmdSidebar": {
+    "message": "Відкрити бічну панель SAVISUL"
+  },
+  "cmdInspect": {
+    "message": "Інспектор CSS"
+  },
+  "cmdTranslate": {
+    "message": "Перекласти сторінку"
+  }
+}

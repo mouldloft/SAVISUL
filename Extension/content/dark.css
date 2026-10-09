@@ -1,0 +1,21 @@
+@media screen {
+  html {
+    --savisul-dark-loaded: 1;
+  }
+
+  html:not([data-savisul-dark="off"]) {
+    filter: invert(0.92) hue-rotate(180deg) !important;
+    background-color: #fff !important;
+    min-height: 100% !important;
+  }
+
+  html:not([data-savisul-dark="off"]) :is(img, video, canvas, iframe, embed, object, svg image):not(:is([style*="background-image"], [style*="background: url"], [style*="background:url"]) *),
+  html:not([data-savisul-dark="off"]) :is([style*="background-image"], [style*="background: url"], [style*="background:url"]):not(:is([style*="background-image"], [style*="background: url"], [style*="background:url"]) *) {
+    filter: invert(1) hue-rotate(180deg) !important;
+  }
+
+  html:not([data-savisul-dark="off"]) :fullscreen,
+  html:not([data-savisul-dark="off"]) :fullscreen :is(img, video, canvas, iframe, embed, object) {
+    filter: none !important;
+  }
+}

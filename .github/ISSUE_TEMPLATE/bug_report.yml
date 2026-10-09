@@ -1,0 +1,31 @@
+name: Bug report
+description: Something in SAVISUL does not work as it should
+title: ""
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what SAVISUL did instead.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: SAVISUL version
+      placeholder: "2.0"
+    validations:
+      required: true
+  - type: input
+    id: macos
+    attributes:
+      label: macOS version
+      placeholder: "26.0"
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: A screenshot helps. Do not paste API keys, clipboard contents or private files.

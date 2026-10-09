@@ -1,0 +1,44 @@
+{
+  "extName": {
+    "message": "SAVISUL"
+  },
+  "extDescription": {
+    "message": "Чёлка вверху каждой страницы: чтение, пипетка, линейка, заметки, тёмная тема, скриншоты всей страницы и управление Mac из SAVISUL."
+  },
+  "actionTitle": {
+    "message": "SAVISUL — открыть чёлку"
+  },
+  "cmdToggle": {
+    "message": "Открыть или закрыть чёлку"
+  },
+  "cmdReader": {
+    "message": "Режим чтения"
+  },
+  "cmdScreenshot": {
+    "message": "Скриншот всей страницы"
+  },
+  "cmdDark": {
+    "message": "Тёмная тема на этом сайте"
+  },
+  "cmdColor": {
+    "message": "Пипетка"
+  },
+  "cmdRuler": {
+    "message": "Линейка"
+  },
+  "cmdNotes": {
+    "message": "Заметка к странице"
+  },
+  "cmdZapper": {
+    "message": "Скрыть элементы"
+  },
+  "cmdSidebar": {
+    "message": "Открыть боковую панель SAVISUL"
+  },
+  "cmdInspect": {
+    "message": "Инспектор CSS"
+  },
+  "cmdTranslate": {
+    "message": "Перевести страницу"
+  }
+}

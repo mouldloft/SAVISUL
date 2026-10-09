@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleExecutable</key>
+	<string>SAVISUL</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.savisul.menu</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>SAVISUL</string>
+	<key>CFBundleDisplayName</key>
+	<string>SAVISUL</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>2.0</string>
+	<key>CFBundleVersion</key>
+	<string>7</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>14.2</string>
+	<key>LSUIElement</key>
+	<false/>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.utilities</string>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>SAVISUL asks macOS for an administrator password when you turn closed-lid mode on or off, asks Finder which folder is open when you paste an image there, and brings up your call's tab in the browser when you use the island's call buttons.</string>
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>SAVISUL notifies you when the processor, memory, battery, or chip temperature crosses a limit you set.</string>
+	<key>NSScreenCaptureUsageDescription</key>
+	<string>SAVISUL takes screenshots and screen recordings when you start them from Tools, and shows live window previews in the app switcher and over the Dock.</string>
+	<key>NSAudioCaptureUsageDescription</key>
+	<string>SAVISUL routes the sound of each app through its mixer so you can set a separate volume, boost it past 100 percent, send it to another output and see the equalizer.</string>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>SAVISUL shows your next meetings in the notch and reminds you five minutes before they start.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>SAVISUL shows your next meetings in the notch and reminds you five minutes before they start.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>SAVISUL shows a camera mirror in the notch so you can check yourself before a call. Nothing is recorded or saved.</string>
+	<key>NSDownloadsFolderUsageDescription</key>
+	<string>SAVISUL shows download progress and finished files in the notch.</string>
+	<key>NSRemovableVolumesUsageDescription</key>
+	<string>SAVISUL installs the app from a disk image you open and then ejects it.</string>
+	<key>NSDesktopFolderUsageDescription</key>
+	<string>SAVISUL saves an image you paste in Finder into the folder that is open.</string>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>SAVISUL saves an image you paste in Finder into the folder that is open.</string>
+</dict>
+</plist>

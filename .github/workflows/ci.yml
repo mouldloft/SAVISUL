@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    # build.sh compiles with the Command Line Tools for Xcode 16.2 (Swift 6.0.3), which this image ships.
+    runs-on: macos-14
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use the Command Line Tools
+        run: sudo xcode-select --switch /Library/Developer/CommandLineTools
+
+      - name: Build
+        run: zsh ./build.sh --no-install
+
+      - name: Tests
+        run: zsh ./scripts/test.sh
+
+      - name: Browser extension tests
+        run: node --test Extension/test/urlclean.test.mjs

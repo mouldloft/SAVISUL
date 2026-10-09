@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Privacy Policy · SAVISUL</title>
+<meta name="description" content="What SAVISUL keeps on your Mac, the few times it connects to the internet, and what the browser extension and this website do with your data.">
+<meta name="theme-color" content="#0b0a09">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/Geologica.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/Onest.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/site.css">
+<script type="module" src="assets/js/doc.js"></script>
+</head>
+<body>
+<header class="doc-top">
+  <a class="brand" href="./"><i data-mark="20"></i>SAVISUL</a>
+  <nav aria-label="Pages">
+    <a href="./" data-i18n="docBack">Back to SAVISUL</a>
+    <a href="privacy.html" aria-current="page" data-i18n="footerPrivacy">Privacy</a>
+    <a href="license.html" data-i18n="footerLicense">License</a>
+    <div class="lang-switch" role="group" aria-label="Language"><button type="button" data-set-lang="en">EN</button><button type="button" data-set-lang="ru">RU</button></div>
+  </nav>
+</header>
+
+<main class="doc">
+  <aside class="doc-toc"><p data-i18n="docContents">On this page</p><nav data-toc></nav></aside>
+
+  <div class="doc-body">
+    <article class="doc-lang" lang="en">
+      <h1>Privacy Policy</h1>
+      <p class="updated">Last updated 6 October 2026</p>
+      <p class="summary">SAVISUL has no accounts, no analytics, no ads and no telemetry. What it knows about you stays on your Mac or in your browser. It connects to the internet only for the few features listed below, and only when you use them.</p>
+
+      <h2 id="who">Who we are</h2>
+      <p>SAVISUL is free, open-source software made by The SAVISUL Authors. This policy covers three things: the SAVISUL app for macOS, the SAVISUL browser extension, and this website. Questions go to <a data-mail="text" href="mailto:mouldloft@gmail.com">mouldloft@gmail.com</a>.</p>
+
+      <h2 id="mac">What the app keeps on your Mac</h2>
+      <p>Everything below is stored in your user folder, mostly in <code>~/Library/Application Support/SAVISUL</code>, and never sent to us. We have no server that could receive it.</p>
+      <ul>
+        <li><strong>Settings</strong> such as language, shortcuts and which features are on.</li>
+        <li><strong>Clipboard history:</strong> up to 1,000 items (text, links, images, files and colors) until you clear them.</li>
+        <li><strong>The Shelf:</strong> references to files you put on it.</li>
+        <li><strong>Work statistics:</strong> time spent in each app, and how many characters and keys were typed there. SAVISUL counts keystrokes; it never records which keys or what text.</li>
+        <li><strong>AI agent status:</strong> read on your Mac from the files Claude Code, Codex, Cursor, OpenCode and Copilot already leave on disk. Nothing is uploaded.</li>
+        <li><strong>Caches:</strong> song lyrics and the day’s exchange rates.</li>
+        <li><strong>Screenshots and recordings</strong> you take, saved to <code>Pictures › SAVISUL</code>.</li>
+      </ul>
+      <p>To remove everything, quit SAVISUL, delete the app and the <code>SAVISUL</code> folder in Application Support.</p>
+
+      <h2 id="permissions">Permissions</h2>
+      <p>macOS asks for each permission the first time a feature needs it. You can turn any of them off in System Settings.</p>
+      <table>
+        <thead><tr><th>Permission</th><th>Used for</th></tr></thead>
+        <tbody>
+          <tr><td>Screen Recording</td><td>Live window previews in the switcher and the Dock</td></tr>
+          <tr><td>Audio capture</td><td>Per-app volume and the island’s equalizer</td></tr>
+          <tr><td>Accessibility and Input Monitoring</td><td>Moving windows, menus, Dock previews, keyboard shortcuts and the typing counter</td></tr>
+          <tr><td>Calendar</td><td>Showing your next meeting in the island</td></tr>
+          <tr><td>Camera</td><td>The mirror in the island. Video is shown live and never recorded or saved</td></tr>
+          <tr><td>Downloads folder</td><td>Download progress and installing apps from disk images</td></tr>
+        </tbody>
+      </table>
+      <p>Closed-lid mode changes the system’s sleep setting, so macOS asks for an administrator password in its own dialog. SAVISUL never sees or stores that password.</p>
+
+      <h2 id="network">When SAVISUL uses the internet</h2>
+      <p>SAVISUL does not check for updates, report usage or “phone home”. These are the only connections it makes:</p>
+      <table>
+        <thead><tr><th>When</th><th>What is sent</th><th>To</th></tr></thead>
+        <tbody>
+          <tr><td>A song starts playing</td><td>Title, artist, album and length, to find time-synced lyrics. Results are cached on your Mac.</td><td><code>lrclib.net</code></td></tr>
+          <tr><td>You convert currency in the command bar</td><td>Nothing about you: the app downloads that day’s exchange rates.</td><td><code>open.er-api.com</code></td></tr>
+          <tr><td>You choose “Search the web”</td><td>Your search opens in your default browser.</td><td>Google</td></tr>
+        </tbody>
+      </table>
+      <p>Like any web request, these services can see your IP address. Their own privacy policies apply to what they do with it.</p>
+
+      <h2 id="extension">The browser extension</h2>
+      <ul>
+        <li><strong>Local storage only.</strong> Settings, page notes, saved sessions and your AI key live in your browser’s local extension storage on this device.</li>
+        <li><strong>Pages are read only when you use a tool</strong> on them: the reader, color picker, translation and so on. The extension can run on any site because those tools work anywhere, not to collect browsing data.</li>
+        <li><strong>Talking to the Mac app</strong> uses native messaging, which stays inside your computer.</li>
+        <li><strong>AI, only with your own key.</strong> If you add an Anthropic API key and ask a question, the text of the page or tabs you chose and your question are sent to Anthropic’s API. Anthropic’s terms and privacy policy apply. Without a key, nothing is sent.</li>
+        <li><strong>Translation</strong> runs on your device with Chrome’s built-in translator. When that isn’t available, the extension opens the page in Google Translate in a new tab.</li>
+        <li><strong>Downloads</strong> of media or archives are fetched directly from the site you are on and saved by your browser.</li>
+      </ul>
+
+      <h2 id="website">This website</h2>
+      <ul>
+        <li>No cookies, no analytics, no ads, and no third-party scripts or fonts.</li>
+        <li>Your language choice is kept in your browser’s local storage.</li>
+        <li>The camera demo in the island runs in your browser, only after you allow it. Nothing is recorded or uploaded.</li>
+        <li>Files you drop on the demo Shelf are read for their names and sizes only, and never leave your browser.</li>
+        <li>Our hosting provider (Railway) processes technical data such as your IP address, browser type and the page requested in order to deliver the site, and may keep short-lived logs for security.</li>
+      </ul>
+
+      <h2 id="sharing">Selling and sharing</h2>
+      <p>We do not sell, rent or share personal data. We don’t receive it in the first place.</p>
+
+      <h2 id="children">Children</h2>
+      <p>SAVISUL is not directed at children under 13, and we do not knowingly collect information from anyone.</p>
+
+      <h2 id="rights">Your rights</h2>
+      <p>Because your data stays on your devices, you control it directly: clear it in the app or delete the folders above. If you email us, we use your message only to reply, and we delete it on request. If you are in the EU, UK or a similar jurisdiction, you can ask us to access or delete anything we hold about you.</p>
+
+      <h2 id="changes">Changes</h2>
+      <p>If this policy changes, we will update this page and the date at the top. Material changes will also be noted in the release notes on GitHub.</p>
+
+      <h2 id="contact">Contact</h2>
+      <p>The SAVISUL Authors · <a data-mail="text" href="mailto:mouldloft@gmail.com">mouldloft@gmail.com</a></p>
+    </article>
+
+    <article class="doc-lang" lang="ru">
+      <h1>Политика конфиденциальности</h1>
+      <p class="updated">Обновлено 6 октября 2026 года</p>
+      <p class="summary">У SAVISUL нет аккаунтов, аналитики, рекламы и телеметрии. Всё, что он знает о вас, остаётся на вашем Mac или в вашем браузере. В интернет он выходит только ради нескольких функций, перечисленных ниже, и только когда вы ими пользуетесь.</p>
+
+      <h2 id="ru-who">Кто мы</h2>
+      <p>SAVISUL — бесплатная программа с открытым кодом от The SAVISUL Authors. Политика касается трёх вещей: приложения SAVISUL для macOS, расширения SAVISUL для браузера и этого сайта. Вопросы присылайте на <a data-mail="text" href="mailto:mouldloft@gmail.com">mouldloft@gmail.com</a>.</p>
+
+      <h2 id="ru-mac">Что приложение хранит на вашем Mac</h2>
+      <p>Всё перечисленное лежит в вашей папке пользователя, в основном в <code>~/Library/Application Support/SAVISUL</code>, и никогда не отправляется нам. У нас нет сервера, который мог бы это принять.</p>
+      <ul>
+        <li><strong>Настройки:</strong> язык, сочетания клавиш, включённые функции.</li>
+        <li><strong>История буфера:</strong> до 1000 записей (текст, ссылки, картинки, файлы и цвета), пока вы их не очистите.</li>
+        <li><strong>Полка:</strong> ссылки на файлы, которые вы на неё положили.</li>
+        <li><strong>Статистика работы:</strong> время в каждом приложении и сколько знаков и нажатий в нём набрано. SAVISUL считает нажатия, но никогда не записывает, какие клавиши и какой текст.</li>
+        <li><strong>Состояние ИИ-агентов:</strong> читается на вашем Mac из файлов, которые Claude Code, Codex, Cursor, OpenCode и Copilot и так оставляют на диске. Ничего не загружается.</li>
+        <li><strong>Кэш:</strong> тексты песен и курсы валют на день.</li>
+        <li><strong>Снимки и записи экрана</strong>, которые вы делаете, — в папке <code>Изображения › SAVISUL</code>.</li>
+      </ul>
+      <p>Чтобы удалить всё, закройте SAVISUL, удалите приложение и папку <code>SAVISUL</code> в Application Support.</p>
+
+      <h2 id="ru-permissions">Разрешения</h2>
+      <p>macOS спрашивает каждое разрешение, когда оно впервые понадобится функции. Любое можно выключить в Системных настройках.</p>
+      <table>
+        <thead><tr><th>Разрешение</th><th>Для чего</th></tr></thead>
+        <tbody>
+          <tr><td>Запись экрана</td><td>Живые превью окон в переключателе и в Dock</td></tr>
+          <tr><td>Захват звука</td><td>Громкость по приложениям и эквалайзер островка</td></tr>
+          <tr><td>Универсальный доступ и мониторинг ввода</td><td>Перемещение окон, меню, превью в Dock, сочетания клавиш и счётчик набора</td></tr>
+          <tr><td>Календарь</td><td>Ближайшая встреча в островке</td></tr>
+          <tr><td>Камера</td><td>Зеркало в островке. Видео показывается вживую и не записывается</td></tr>
+          <tr><td>Папка «Загрузки»</td><td>Прогресс загрузок и установка программ из образов</td></tr>
+        </tbody>
+      </table>
+      <p>Режим закрытой крышки меняет системную настройку сна, поэтому macOS просит пароль администратора в своём окне. SAVISUL этот пароль не видит и не хранит.</p>
+
+      <h2 id="ru-network">Когда SAVISUL выходит в интернет</h2>
+      <p>SAVISUL не проверяет обновления, не отправляет статистику и никуда «не звонит». Вот все соединения, которые он делает:</p>
+      <table>
+        <thead><tr><th>Когда</th><th>Что отправляется</th><th>Куда</th></tr></thead>
+        <tbody>
+          <tr><td>Начинает играть песня</td><td>Название, исполнитель, альбом и длительность — чтобы найти текст с таймингом. Результат кэшируется на Mac.</td><td><code>lrclib.net</code></td></tr>
+          <tr><td>Вы переводите валюту в командной строке</td><td>Ничего о вас: приложение скачивает курсы на день.</td><td><code>open.er-api.com</code></td></tr>
+          <tr><td>Вы выбираете «Искать в интернете»</td><td>Запрос открывается в вашем браузере.</td><td>Google</td></tr>
+        </tbody>
+      </table>
+      <p>Как и при любом запросе в интернет, эти сервисы видят ваш IP-адрес. Что они с ним делают, определяют их собственные политики.</p>
+
+      <h2 id="ru-extension">Расширение для браузера</h2>
+      <ul>
+        <li><strong>Только локальное хранилище.</strong> Настройки, заметки к страницам, сохранённые сессии и ваш ключ ИИ лежат в локальном хранилище расширения на этом устройстве.</li>
+        <li><strong>Страница читается, только когда вы применяете к ней инструмент:</strong> чтение, пипетку, перевод и так далее. Расширение работает на любом сайте, потому что инструменты нужны везде, а не чтобы собирать историю.</li>
+        <li><strong>Связь с приложением на Mac</strong> идёт через native messaging и не выходит за пределы компьютера.</li>
+        <li><strong>ИИ — только с вашим ключом.</strong> Если вы добавили ключ Anthropic API и задали вопрос, текст выбранной страницы или вкладок и ваш вопрос уходят в API Anthropic. Действуют условия и политика Anthropic. Без ключа ничего не отправляется.</li>
+        <li><strong>Перевод</strong> выполняется на устройстве встроенным переводчиком Chrome. Если он недоступен, расширение открывает страницу в Google Переводчике в новой вкладке.</li>
+        <li><strong>Скачивание</strong> медиа и архивов идёт напрямую с сайта, на котором вы находитесь, и сохраняется вашим браузером.</li>
+      </ul>
+
+      <h2 id="ru-website">Этот сайт</h2>
+      <ul>
+        <li>Без cookie, аналитики, рекламы и сторонних скриптов и шрифтов.</li>
+        <li>Выбранный язык хранится в локальном хранилище браузера.</li>
+        <li>Демо камеры в островке работает в браузере и только после вашего разрешения. Ничего не записывается и не загружается.</li>
+        <li>У файлов, брошенных на демо-полку, читаются только имя и размер. Они не покидают браузер.</li>
+        <li>Наш хостинг (Railway) обрабатывает технические данные — IP-адрес, тип браузера, запрошенную страницу — чтобы показать сайт, и может хранить короткие журналы для безопасности.</li>
+      </ul>
+
+      <h2 id="ru-sharing">Продажа и передача данных</h2>
+      <p>Мы не продаём, не сдаём и не передаём персональные данные. Мы их даже не получаем.</p>
+
+      <h2 id="ru-children">Дети</h2>
+      <p>SAVISUL не предназначен для детей младше 13 лет, и мы ни у кого сознательно не собираем данные.</p>
+
+      <h2 id="ru-rights">Ваши права</h2>
+      <p>Данные остаются на ваших устройствах, поэтому вы управляете ими сами: очистите их в приложении или удалите папки, указанные выше. Если вы пишете нам, письмо используется только для ответа и удаляется по вашей просьбе. Если вы находитесь в ЕС, Великобритании или похожей юрисдикции, можете запросить доступ к любым данным о вас или их удаление.</p>
+
+      <h2 id="ru-changes">Изменения</h2>
+      <p>Если политика изменится, мы обновим эту страницу и дату вверху. О существенных изменениях напишем и в заметках к релизу на GitHub.</p>
+
+      <h2 id="ru-contact">Связаться</h2>
+      <p>The SAVISUL Authors · <a data-mail="text" href="mailto:mouldloft@gmail.com">mouldloft@gmail.com</a></p>
+    </article>
+  </div>
+</main>
+
+<footer class="site-footer doc-foot">
+  <div class="footer-brand"><i data-mark="20"></i><span data-rights>© 2026 The SAVISUL Authors</span></div>
+  <nav class="footer-links" aria-label="Footer">
+    <a href="./" data-i18n="docBack">Back to SAVISUL</a>
+    <a href="license.html" data-i18n="footerLicense">License</a>
+    <a data-mail href="mailto:mouldloft@gmail.com" data-i18n="footerContact">Contact</a>
+  </nav>
+  <span></span>
+  <p class="trademarks" data-i18n="footerTrademarks">Not affiliated with Apple Inc. or Google LLC. Mac, MacBook and macOS are trademarks of Apple Inc. Chrome is a trademark of Google LLC.</p>
+</footer>
+</body>
+</html>

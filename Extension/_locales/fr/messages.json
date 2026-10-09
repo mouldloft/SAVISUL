@@ -1,0 +1,44 @@
+{
+  "extName": {
+    "message": "SAVISUL"
+  },
+  "extDescription": {
+    "message": "Une encoche en haut de chaque page : lecture, pipette, règle, notes, thème sombre, captures de page entière et commandes du Mac depuis SAVISUL."
+  },
+  "actionTitle": {
+    "message": "SAVISUL — ouvrir l’encoche"
+  },
+  "cmdToggle": {
+    "message": "Ouvrir ou fermer l’encoche"
+  },
+  "cmdReader": {
+    "message": "Mode lecture"
+  },
+  "cmdScreenshot": {
+    "message": "Capture de la page entière"
+  },
+  "cmdDark": {
+    "message": "Thème sombre sur ce site"
+  },
+  "cmdColor": {
+    "message": "Pipette"
+  },
+  "cmdRuler": {
+    "message": "Règle"
+  },
+  "cmdNotes": {
+    "message": "Note pour cette page"
+  },
+  "cmdZapper": {
+    "message": "Masquer des éléments"
+  },
+  "cmdSidebar": {
+    "message": "Ouvrir le panneau latéral SAVISUL"
+  },
+  "cmdInspect": {
+    "message": "Inspecter le CSS"
+  },
+  "cmdTranslate": {
+    "message": "Traduire la page"
+  }
+}

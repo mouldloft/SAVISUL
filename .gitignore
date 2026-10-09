@@ -1,0 +1,15 @@
+# Build output
+.build/
+dist/
+
+# Local code-signing identity, created by scripts/signing.sh
+.signing/
+
+# Browser tests
+node_modules/
+tools/extension-test/out/
+tools/extension-test/out-platform/
+tools/extension-test/.bin/
+tools/extension-test/package-lock.json
+
+.DS_Store

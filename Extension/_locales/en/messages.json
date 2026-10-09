@@ -1,0 +1,44 @@
+{
+  "extName": {
+    "message": "SAVISUL"
+  },
+  "extDescription": {
+    "message": "A notch at the top of every page: reader, color picker, ruler, notes, dark theme, full-page screenshots, and your Mac controls from SAVISUL."
+  },
+  "actionTitle": {
+    "message": "SAVISUL — open the notch"
+  },
+  "cmdToggle": {
+    "message": "Open or close the notch"
+  },
+  "cmdReader": {
+    "message": "Reader mode"
+  },
+  "cmdScreenshot": {
+    "message": "Full-page screenshot"
+  },
+  "cmdDark": {
+    "message": "Dark theme on this site"
+  },
+  "cmdColor": {
+    "message": "Color picker"
+  },
+  "cmdRuler": {
+    "message": "Ruler"
+  },
+  "cmdNotes": {
+    "message": "Note for this page"
+  },
+  "cmdZapper": {
+    "message": "Hide elements"
+  },
+  "cmdSidebar": {
+    "message": "Open the SAVISUL sidebar"
+  },
+  "cmdInspect": {
+    "message": "Inspect CSS"
+  },
+  "cmdTranslate": {
+    "message": "Translate the page"
+  }
+}

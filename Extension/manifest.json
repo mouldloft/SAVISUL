@@ -1,0 +1,145 @@
+{
+  "manifest_version": 3,
+  "name": "__MSG_extName__",
+  "short_name": "SAVISUL",
+  "description": "__MSG_extDescription__",
+  "version": "1.4.1",
+  "default_locale": "en",
+  "minimum_chrome_version": "116",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr3oZb8LTT4A6ECvWUv2g7Rua40LUefmJ+C8zpExFHofVpABhBXF9mV0hmIkV3IqSGbPm3YZCTeC9Q2xjXN5XX8ghMs0NcjyT6UheQVmgTYvcG69ibttn1R907ehqk08gEtSf8GDI8o5o6fZCN6oUZZjxj2CCzBlc5m9e0Zu2cDutvBVm41w1zwR995wq6vJbJxDqLlIumDhXQkRF/KgRCSKgw6jVB1p+SweQ5haUoGiyedyfs8vw2rA9uQgXFsqgo/9vwTEhZqM5mSC4mqKQP/03GRuDNc193fJeEqm3uCl1OZtQyb4CWgE91lkgbPp3sF8PqwcCc2z87v5ZrJV1iQIDAQAB",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "__MSG_actionTitle__",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "options_ui": {
+    "page": "pages/options.html",
+    "open_in_tab": true
+  },
+  "side_panel": {
+    "default_path": "pages/sidebar.html"
+  },
+  "permissions": [
+    "storage",
+    "unlimitedStorage",
+    "scripting",
+    "activeTab",
+    "downloads",
+    "nativeMessaging",
+    "tabs",
+    "tabGroups",
+    "sidePanel",
+    "bookmarks",
+    "pageCapture",
+    "alarms",
+    "contextMenus",
+    "sessions",
+    "favicon",
+    "offscreen"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content/early.js"
+      ],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "shared/i18n.js",
+        "shared/i18n-browser.js",
+        "shared/urlclean.js",
+        "shared/store.js",
+        "shared/qr.js",
+        "content/core.js",
+        "content/icons.js",
+        "content/style.js",
+        "content/notch.js",
+        "content/tools/dark.js",
+        "content/tools/reader.js",
+        "content/tools/color.js",
+        "content/tools/ruler.js",
+        "content/tools/notes.js",
+        "content/tools/shot.js",
+        "content/tools/zapper.js",
+        "content/tools/fonts.js",
+        "content/tools/link.js",
+        "content/tools/media.js",
+        "content/tools/inspect.js",
+        "content/tools/tables.js",
+        "content/tools/translate.js",
+        "content/tools/page.js",
+        "content/tools/export.js",
+        "content/main.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "commands": {
+    "toggle-notch": {
+      "suggested_key": {
+        "default": "Alt+Shift+N"
+      },
+      "description": "__MSG_cmdToggle__"
+    },
+    "reader": {
+      "suggested_key": {
+        "default": "Alt+Shift+R"
+      },
+      "description": "__MSG_cmdReader__"
+    },
+    "full-screenshot": {
+      "suggested_key": {
+        "default": "Alt+Shift+S"
+      },
+      "description": "__MSG_cmdScreenshot__"
+    },
+    "dark": {
+      "suggested_key": {
+        "default": "Alt+Shift+D"
+      },
+      "description": "__MSG_cmdDark__"
+    },
+    "color": {
+      "description": "__MSG_cmdColor__"
+    },
+    "ruler": {
+      "description": "__MSG_cmdRuler__"
+    },
+    "notes": {
+      "description": "__MSG_cmdNotes__"
+    },
+    "zapper": {
+      "description": "__MSG_cmdZapper__"
+    },
+    "sidebar": {
+      "description": "__MSG_cmdSidebar__"
+    },
+    "inspect": {
+      "description": "__MSG_cmdInspect__"
+    },
+    "translate": {
+      "description": "__MSG_cmdTranslate__"
+    }
+  }
+}

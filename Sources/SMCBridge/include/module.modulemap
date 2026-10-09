@@ -1,0 +1,4 @@
+module SMCBridge {
+    header "smc_bridge.h"
+    export *
+}
