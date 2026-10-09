@@ -52,7 +52,7 @@ SAVISUL replaces a pile of small utilities with one system: an island in the not
 Your MacBook's notch becomes an activity center. Hover it and it opens. While music or a call fills it, an agent at work gets a small island of its own beside it.
 
 - **Music and live lyrics** — what's playing, synced to the line.
-- **Calls** — Zoom, Teams, FaceTime, Telegram, WhatsApp, Discord, or a meeting in a browser tab: how long you've been on, and buttons for the microphone, the camera, the sound and hanging up.
+- **Calls** — Zoom, Teams, FaceTime, Telegram, WhatsApp, Discord, or a meeting in a browser tab: how long you've been on, and buttons for the microphone, the camera, the sound and hanging up. Telegram lets no other app press its call buttons, so there the camera and hang-up buttons bring its call window forward.
 - **Your AI agents** — your coding agents at a glance: who is working, on which project, and their tokens, code and limits.
 - **Volume and headphones** — the level as you change it, and AirPods or any other output the moment it connects.
 - **Live activities** — downloads, timers, conversions, captures and AI tasks as they happen.

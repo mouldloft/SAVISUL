@@ -336,6 +336,10 @@ final class Suite {
             case .openedApp:
                 self.notify(IslandNotice(symbol: action == .hangUp ? "phone.down.fill" : "video.fill", tint: Palette.accent,
                                          title: action == .hangUp ? Phrases.finishIn(call.name) : Phrases.cameraIn(call.name), detail: nil, duration: 3))
+            case .inAppOnly:
+                self.notify(IslandNotice(symbol: action == .hangUp ? "phone.down.fill" : "video.fill", tint: Palette.accent,
+                                         title: action == .hangUp ? Phrases.finishIn(call.name) : Phrases.cameraIn(call.name),
+                                         detail: Phrases.noButtons(call.name), duration: 4.5))
             case .needsAccess:
                 self.notify(IslandNotice(symbol: "hand.raised.fill", tint: Palette.warning, title: Phrases.callNeedsAccess.text, detail: nil,
                                          style: .warning, duration: 5, actionTitle: Phrases.allow.text,
@@ -365,7 +369,7 @@ final class Suite {
                 self.notify(IslandNotice(symbol: "hand.raised.fill", tint: Palette.warning, title: Phrases.callNeedsAccess.text, detail: nil,
                                          style: .warning, duration: 5, actionTitle: Phrases.allow.text,
                                          action: { [weak self] in self?.app?.permissions.requestAccessibility() }))
-            case .notFound, .openedApp:
+            case .notFound, .openedApp, .inAppOnly:
                 self.sound.toggleMics()
             }
         }
@@ -478,5 +482,9 @@ extension Phrases {
     }
     @MainActor static func cameraIn(_ name: String) -> String {
         Phrase("Switch the camera in %@", ru: "Переключите камеру в %@", uk: "Перемкніть камеру в %@", fr: "Changez la caméra dans %@")(name)
+    }
+    @MainActor static func noButtons(_ name: String) -> String {
+        Phrase("%@ doesn’t let other apps press its call buttons", ru: "%@ не даёт другим приложениям нажимать кнопки звонка",
+               uk: "%@ не дає іншим застосункам натискати кнопки дзвінка", fr: "%@ ne laisse pas les autres apps appuyer sur ses boutons d’appel")(name)
     }
 }

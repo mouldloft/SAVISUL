@@ -7,7 +7,8 @@ import Carbon.HIToolbox
 /// 1. the button or menu item that does it, pressed through Accessibility without bringing the app forward;
 ///    in a browser the call's tab is made current first when another tab hides it;
 /// 2. the app's own shortcut, sent only once the app is really in front, so it never lands in another app;
-/// 3. the app brought to the front, so the call is finished in it.
+/// 3. the app brought to the front on the call's own window, so the call is finished in it.
+/// Apps that let nothing be pressed skip straight to the last step.
 enum CallControls {
     enum Action: Equatable { case microphone, camera, hangUp }
 
@@ -18,6 +19,8 @@ enum CallControls {
         case confirmInApp
         /// Nothing to press: the app is in front, the person finishes there.
         case openedApp
+        /// The app lets nothing press its call buttons; its call window is in front for the person to use.
+        case inAppOnly
         /// Accessibility is off, so nothing can be pressed.
         case needsAccess
         /// The microphone has no button to press here; the caller mutes every microphone instead.
@@ -36,6 +39,11 @@ enum CallControls {
     private static let meet = "com.google.Chrome.app.kjgfgldnnfoeklkmfkjfagphfepbbdan"
     private static let discord: Set<String> = ["com.hnc.Discord", "com.hnc.DiscordPTB", "com.hnc.DiscordCanary"]
     private static let apple: Set<String> = ["com.apple.FaceTime", "com.apple.mobilephone"]
+
+    /// Apps whose call window hides its buttons from Accessibility and has no shortcuts for them, so nothing in it can be
+    /// pressed from outside. Telegram for macOS draws every control itself, reports none of them, and acts only on a real
+    /// click under the pointer. Their microphone is muted along with every other one; the camera and hanging up stay in the app.
+    static let closed: Set<String> = ["ru.keepcoder.Telegram"]
 
     static func shortcut(_ action: Action, bundle: String) -> Shortcut? {
         switch action {
@@ -144,6 +152,11 @@ enum CallControls {
             done(action == .microphone ? .notFound : .openedApp)
             return
         }
+        if closed.contains(call.bundle) {
+            if action == .microphone { return done(.notFound) }
+            bringForward(app)
+            return done(.inAppOnly)
+        }
         guard AX.trusted else {
             if action != .microphone { app.activate() }
             done(.needsAccess)
@@ -163,11 +176,11 @@ enum CallControls {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                     attempt(action, pid: pid, bundle: bundle, browser: browser) { again in
                         if again == .done { return done(.done) }
-                        finish(action, app: app, bundle: bundle, done: done)
+                        finish(action, app: app, bundle: bundle, browser: browser, done: done)
                     }
                 }
             } else {
-                finish(action, app: app, bundle: bundle, done: done)
+                finish(action, app: app, bundle: bundle, browser: browser, done: done)
             }
         }
     }
@@ -183,7 +196,8 @@ enum CallControls {
 
     /// Nothing could be pressed: the app's shortcut when it has one, otherwise the app comes forward.
     @MainActor
-    private static func finish(_ action: Action, app: NSRunningApplication, bundle: String, done: @escaping @MainActor (Outcome) -> Void) {
+    private static func finish(_ action: Action, app: NSRunningApplication, bundle: String, browser: Bool,
+                               done: @escaping @MainActor (Outcome) -> Void) {
         if let shortcut = shortcut(action, bundle: bundle) {
             send(shortcut, to: app) { sent in
                 if !sent { record(action, pid: app.processIdentifier, bundle: bundle) }
@@ -193,7 +207,7 @@ enum CallControls {
         }
         record(action, pid: app.processIdentifier, bundle: bundle)
         if action == .microphone { return done(.notFound) }
-        bringForward(app)
+        bringForward(app, browser: browser)
         done(.openedApp)
     }
 
@@ -347,13 +361,36 @@ enum CallControls {
         }
     }
 
+    /// An app comes forward on its call's window; a browser on its front window, where the call's tab has been made current.
     @MainActor
-    static func bringForward(_ app: NSRunningApplication) {
-        if let window = AX.windows(app.processIdentifier).first {
-            AX.focus(window, pid: app.processIdentifier)
+    static func bringForward(_ app: NSRunningApplication, browser: Bool = false) {
+        let pid = app.processIdentifier
+        let windows = AX.windows(pid)
+        let facts = windows.map { WindowFacts(id: AX.windowID($0), title: AX.title($0), size: AX.size($0), standard: AX.isStandardWindow($0)) }
+        if let index = browser ? (windows.isEmpty ? nil : 0) : callWindow(facts, appName: app.localizedName) {
+            AX.focus(windows[index], pid: pid)
         } else {
             app.activate()
         }
+    }
+
+    struct WindowFacts: Equatable {
+        var id: CGWindowID?
+        var title: String?
+        var size: CGSize?
+        var standard: Bool
+    }
+
+    /// Which of an app's windows holds its call: the newest standard window big enough for one, other than the window
+    /// named after the app, which is its main window. The newest is the one the call opened, like Telegram's call
+    /// behind its chat list. The front window when none qualifies.
+    static func callWindow(_ windows: [WindowFacts], appName: String?) -> Int? {
+        let candidates = windows.indices.filter { index in
+            let window = windows[index]
+            guard window.standard, let size = window.size, size.width >= 300, size.height >= 300 else { return false }
+            return appName == nil || window.title != appName
+        }
+        return candidates.max { (windows[$0].id ?? 0) < (windows[$1].id ?? 0) } ?? (windows.isEmpty ? nil : 0)
     }
 
     // MARK: When nothing matched
@@ -441,6 +478,6 @@ enum CallTabs {
     @MainActor
     static func open(bundle: String, app: NSRunningApplication) {
         _ = select(bundle: bundle)
-        CallControls.bringForward(app)
+        CallControls.bringForward(app, browser: true)
     }
 }

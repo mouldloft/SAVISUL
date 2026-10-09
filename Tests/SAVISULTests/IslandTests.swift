@@ -127,6 +127,29 @@ private let start = Date(timeIntervalSinceReferenceDate: 1_000)
     #expect(CallControls.micMuted(fromLabel: "Microphone") == nil)
 }
 
+@Test func theCallsWindowIsTheNewestOneThatCanHoldACall() {
+    typealias Facts = CallControls.WindowFacts
+    let main = Facts(id: 120, title: "Telegram", size: CGSize(width: 1180, height: 820), standard: true)
+    let call = Facts(id: 5_310, title: "", size: CGSize(width: 720, height: 560), standard: true)
+    #expect(CallControls.callWindow([main, call], appName: "Telegram") == 1)
+    #expect(CallControls.callWindow([call, main], appName: "Telegram") == 0)
+    // Only the main window: it is the one to show.
+    #expect(CallControls.callWindow([main], appName: "Telegram") == 0)
+    // A meeting window beats an older main window and a newer floating toolbar.
+    let zoomMain = Facts(id: 300, title: "Zoom Workplace", size: CGSize(width: 1000, height: 700), standard: true)
+    let meeting = Facts(id: 4_100, title: "Zoom Meeting", size: CGSize(width: 1280, height: 800), standard: true)
+    let toolbar = Facts(id: 4_200, title: nil, size: CGSize(width: 420, height: 52), standard: true)
+    let panel = Facts(id: 4_300, title: nil, size: CGSize(width: 400, height: 500), standard: false)
+    #expect(CallControls.callWindow([toolbar, zoomMain, panel, meeting], appName: "zoom.us") == 3)
+    #expect(CallControls.callWindow([], appName: "Telegram") == nil)
+}
+
+@Test func appsThatHideTheirCallButtonsAreKnown() {
+    #expect(CallControls.closed.contains("ru.keepcoder.Telegram"))
+    #expect(!CallControls.closed.contains("us.zoom.xos"))
+    #expect(!CallControls.closed.contains("com.apple.FaceTime"))
+}
+
 @Test func callPagesAreKnownByTheirAddress() {
     #expect(CallTabs.isCallPage("https://meet.google.com/abc-defg-hij"))
     #expect(CallTabs.isCallPage("https://app.zoom.us/wc/123/join"))

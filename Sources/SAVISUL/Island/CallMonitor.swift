@@ -75,7 +75,7 @@ final class CallMonitor {
             if call != current { current = call }
         }
         ticks += 1
-        if let call = current, ticks % 2 == 0, !reading { readMicrophone(call) }
+        if let call = current, ticks % 2 == 0, !reading, !CallControls.closed.contains(call.bundle) { readMicrophone(call) }
     }
 
     /// Reads the call's own microphone button off the main thread; a browser page can take a moment.
