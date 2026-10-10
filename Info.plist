@@ -19,9 +19,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.0</string>
+	<string>2.1</string>
 	<key>CFBundleVersion</key>
-	<string>7</string>
+	<string>8</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>14.2</string>
 	<key>LSUIElement</key>
@@ -45,7 +45,7 @@
 	<key>NSCalendarsUsageDescription</key>
 	<string>SAVISUL shows your next meetings in the notch and reminds you five minutes before they start.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>SAVISUL shows a camera mirror in the notch so you can check yourself before a call. Nothing is recorded or saved.</string>
+	<string>SAVISUL shows a camera mirror in the notch so you can check yourself before a call and, if you turn on Face Unlock, recognizes you at the lock screen. Nothing is recorded or saved.</string>
 	<key>NSDownloadsFolderUsageDescription</key>
 	<string>SAVISUL shows download progress and finished files in the notch.</string>
 	<key>NSRemovableVolumesUsageDescription</key>

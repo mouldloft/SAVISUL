@@ -73,6 +73,11 @@ final class SuiteSettings {
     var agentChime: Bool { didSet { put(agentChime, "agentChime") } }
     var agentMinimumMinutes: Double { didSet { put(agentMinimumMinutes, "agentMinimumMinutes") } }
 
+    // Face Unlock
+    var faceUnlock: Bool { didSet { put(faceUnlock, "faceUnlock") } }
+    var faceUnlockBlink: Bool { didSet { put(faceUnlockBlink, "faceUnlockBlink") } }
+    var faceUnlockRightAway: Bool { didSet { put(faceUnlockRightAway, "faceUnlockRightAway") } }
+
     static let defaultFavorites = [
         "capture.area", "clipboard.open", "shelf.open", "timer.5", "sound.mute", "mic.mute", "display.off", "command.open"
     ]
@@ -138,6 +143,10 @@ final class SuiteSettings {
 
         agentChime = Self.read("agentChime", true)
         agentMinimumMinutes = Self.read("agentMinimumMinutes", 1)
+
+        faceUnlock = Self.read("faceUnlock", false)
+        faceUnlockBlink = Self.read("faceUnlockBlink", false)
+        faceUnlockRightAway = Self.read("faceUnlockRightAway", true)
     }
 
     private static func read<T>(_ key: String, _ fallback: T) -> T {

@@ -482,3 +482,40 @@ html:not([data-lang="ru"]) [lang="ru"].doc-lang, html[data-lang="ru"] [lang="en"
   .doc-top nav a:not([aria-current]) { display: none; }
 }
 .not-found-notch { position: relative; left: auto; transform: none; margin: 0 auto; }
+
+/* MARK: Face Unlock, acted out (face.js) */
+
+.face-demo { position: relative; width: 100%; aspect-ratio: 2 / 1; overflow: hidden; border-radius: 16px; background: var(--ground); isolation: isolate; }
+.face-demo.fd-over { position: absolute; inset: 0; z-index: 85; width: auto; aspect-ratio: auto; border-radius: 0; transition: opacity 0.45s ease; }
+.fd-stage { position: absolute; left: 50%; top: 50%; width: 1280px; height: 640px; overflow: hidden; transform: translate(-50%, -50%); transform-origin: center; color: #fff; font-family: var(--ui); }
+.fd-wallpaper { position: absolute; inset: -48px; background: url("../img/wallpaper.svg") center 64% / cover no-repeat, var(--ground); }
+.fd-lock { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; padding-top: 266px; text-align: center; }
+.fd-date { font: 600 30px/1 var(--ui); letter-spacing: 0.01em; color: rgba(255, 255, 255, 0.84); }
+.fd-time { margin-top: 8px; font: 700 168px/1 var(--ui); letter-spacing: -0.03em; color: rgba(255, 255, 255, 0.9); font-variant-numeric: tabular-nums; }
+.fd-user { position: absolute; left: 50%; bottom: 34px; transform: translateX(-50%); display: flex; align-items: center; gap: 12px; }
+.fd-avatar { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: rgba(255, 255, 255, 0.9); background: linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.12)); }
+.fd-field { height: 36px; padding: 0 18px; border-radius: 18px; display: inline-flex; align-items: center; color: rgba(255, 255, 255, 0.62); font: 500 15px/1 var(--ui); background: rgba(255, 255, 255, 0.16); }
+.fd-desktop { position: absolute; inset: 0; transform-origin: 50% 40%; }
+.fd-menubar { position: absolute; inset: 0 0 auto; height: 30px; background: rgba(40, 35, 29, 0.42); }
+.fd-window { position: absolute; display: flex; flex-direction: column; gap: 14px; padding: 46px 26px 0; border-radius: 14px; background: rgba(28, 25, 22, 0.78); box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.14), 0 30px 60px -20px rgba(0, 0, 0, 0.6); }
+.fd-window i { position: absolute; top: 16px; left: 18px; width: 12px; height: 12px; border-radius: 50%; background: #ff5f57; box-shadow: 20px 0 0 #febc2e, 40px 0 0 #28c840; }
+.fd-window b { display: block; height: 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.12); }
+.fd-window b:nth-of-type(2) { width: 72%; }
+.fd-window b:nth-of-type(3) { width: 48%; }
+.fd-window.one { left: 110px; top: 150px; width: 430px; height: 300px; }
+.fd-window.two { right: 120px; top: 210px; width: 380px; height: 250px; }
+.fd-island { position: absolute; top: 0; left: 50%; transform: translateX(-50%); background: #000; border-radius: 0 0 var(--radius, 14px) var(--radius, 14px); }
+.fd-island::before, .fd-island::after { content: ""; position: absolute; top: 0; width: 12px; height: 12px; }
+.fd-island::before { left: -12px; background: radial-gradient(circle at 0 100%, transparent 11.5px, #000 12px); }
+.fd-island::after { right: -12px; background: radial-gradient(circle at 100% 100%, transparent 11.5px, #000 12px); }
+.fd-body { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; }
+.fd-lens { position: absolute; top: 14px; left: 50%; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #3a4458, #06070a 70%); }
+.fd-padlock { position: absolute; left: 50%; top: 52px; display: grid; transform: translateX(-50%); color: #fff; }
+.fd-ring { position: absolute; left: 50%; top: 138px; width: 0; height: 0; }
+.fd-ring i { position: absolute; left: -2px; top: -8px; width: 4px; height: 16px; border-radius: 2px; background: color-mix(in srgb, var(--mint) calc(var(--g, 0) * 100%), #fff); transform: rotate(var(--a)) translateY(calc(var(--r) * -1)); }
+.fd-face, .fd-check { position: absolute; left: 50%; top: 138px; display: grid; transform: translate(-50%, -50%); }
+.fd-face { color: #fff; }
+.fd-check { color: var(--mint); }
+.fd-notice { position: absolute; left: 50%; bottom: 16px; display: flex; align-items: center; gap: 12px; transform: translateX(-50%); white-space: nowrap; font: 600 22px/1 var(--ui); color: #fff; }
+.fd-notice-check { color: var(--mint); }
+.plate-face { padding: 12px; }

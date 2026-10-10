@@ -18,7 +18,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.0.dmg"><img src="https://img.shields.io/badge/Download-SAVISUL%202.0-DBC7A3?style=for-the-badge&logo=apple&logoColor=DBC7A3&labelColor=17130E" alt="Download SAVISUL 2.0" height="36"></a>
+  <a href="https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.1.dmg"><img src="https://img.shields.io/badge/Download-SAVISUL%202.1-DBC7A3?style=for-the-badge&logo=apple&logoColor=DBC7A3&labelColor=17130E" alt="Download SAVISUL 2.1" height="36"></a>
 </p>
 
 <p align="center">
@@ -61,6 +61,21 @@ Your MacBook's notch becomes an activity center. Hover it and it opens. While mu
 <p align="center">
   <img src="docs/readme/live.png" alt="The island live: a call with an agent working beside it, the call's mute button, the volume, AirPods connecting and an agent starting" width="880">
 </p>
+
+## Face Unlock
+
+Unlock your Mac by looking at it. Lock it, glance at the screen, and a padlock under the notch turns into a scanning ring, then a green check — and you're in, in about a second.
+
+<p align="center">
+  <img src="docs/readme/face-unlock.gif" alt="Face Unlock at the lock screen: a padlock under the notch, a scanning ring around the face, a green check, and the Mac opens" width="880">
+</p>
+
+- **Hands-free** — it starts looking a moment after the lock, and again whenever you wake the Mac or touch a key.
+- **Only when you look** — your eyes have to be open and on the screen. Turn on the blink check too, and a photo won't get in.
+- **Learns your face** — each unlock teaches it a new light or look, and it knows you from across the desk.
+- **Stays on your Mac** — macOS's own face recognizer makes the faceprints. They and your password stay in this Mac's keychain, and the camera runs only while it looks.
+
+A Mac camera sees in 2D, so Face Unlock is a convenience, not iPhone Face ID: a good photo or video of you could get past it, unless the blink check is on for photos. Your password is still asked after a restart and at least once a week. It is off until you set it up in **Features → Face Unlock**.
 
 ## Context Actions
 
@@ -168,6 +183,7 @@ It talks to the Mac app, so a page, an image or a selection goes straight into a
 - Keep Awake
 - Screen Capture
 - Power Tools
+- Face Unlock
 
 </details>
 
@@ -217,7 +233,7 @@ SAVISUL is built around a unified Actions Engine. Every action describes its inp
 
 SAVISUL runs on macOS 14.2 or later on a Mac with Apple silicon.
 
-1. Download [SAVISUL-2.0.dmg](https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.0.dmg) from [Releases](https://github.com/mouldloft/SAVISUL/releases/latest) or the [website](https://www.savisul.com)
+1. Download [SAVISUL-2.1.dmg](https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.1.dmg) from [Releases](https://github.com/mouldloft/SAVISUL/releases/latest) or the [website](https://www.savisul.com)
 2. Drag SAVISUL into Applications
 3. Open SAVISUL
 4. Grant only the permissions required by the features you use
@@ -258,7 +274,7 @@ SAVISUL only requests a permission when a feature needs it. You can turn any of 
 | Audio capture | Per-app volume and the island equalizer |
 | Notifications | Alerts you turned on |
 | Calendar | The next meeting on the island |
-| Camera | The island camera mirror. Video is shown live and is not saved |
+| Camera | The island camera mirror and Face Unlock at the lock screen. Video is read live and never saved |
 | Downloads, Desktop and Documents | Downloads, Shelf, captures and disk-image installs |
 | Automation | Asking Finder and macOS to do something you started |
 
@@ -274,6 +290,7 @@ SAVISUL is designed local-first.
 - AI requests are only sent to the provider you configure
 - Local AI providers such as Ollama can run without cloud processing
 - Calls are noticed from which app is using the microphone; the sound itself is never read
+- Face Unlock keeps your faceprints and your Mac password in the Keychain, and runs the camera only while it looks for you
 - No analytics, no telemetry and no ads
 
 Lyrics lookup sends a track’s title, artist, album and length to lrclib.net. Currency conversion downloads the day’s rates. Those are the app’s own network calls, and only when you use the feature. Details are in [PRIVACY.md](PRIVACY.md) and on the [website](https://www.savisul.com/privacy).
@@ -315,6 +332,13 @@ No. SAVISUL is built for Apple silicon and needs macOS 14.2 or later.
 <summary><b>How does the island know I'm on a call?</b></summary>
 
 It asks macOS which apps are using the microphone right now, the same fact behind the orange dot in the menu bar. Nothing is recorded or listened to.
+
+</details>
+
+<details>
+<summary><b>Is Face Unlock as safe as Face ID?</b></summary>
+
+No. iPhone Face ID has a 3D infrared camera; a Mac has an ordinary one, so a good photo or video of you could get past it. Turn on **Stricter: wait for a blink** to stop photos. Your password is still asked after a restart, at least once a week and after five strangers in a row, and the password is typed only into the lock screen of your own account.
 
 </details>
 

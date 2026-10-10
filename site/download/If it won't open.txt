@@ -1,6 +1,6 @@
 If macOS says the file can’t be opened, don’t delete it.
 Open Terminal (Spotlight → Terminal), paste all of the text below and press Return.
-SAVISUL-2.0.dmg should be in your Downloads folder.
+The SAVISUL disk image (.dmg) should be in your Downloads folder.
 
 zsh <<'SAVISUL'
 # Installs SAVISUL after macOS refuses to open the downloaded file.
@@ -104,7 +104,7 @@ for item in $candidates; do
 done
 
 if [[ -z "$newest" ]]; then
-  print -r -- "SAVISUL not found. Put SAVISUL-2.0.dmg in Downloads and paste the command again."
+  print -r -- "SAVISUL not found. Put the SAVISUL disk image (.dmg) in Downloads and paste the command again."
   exit 1
 fi
 

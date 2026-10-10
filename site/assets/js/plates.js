@@ -4,6 +4,7 @@ import { icon, mark } from './icons.js';
 import { t, lang } from './i18n.js';
 import { evaluate, convert, fixLayout } from './overlays.js';
 import { createPanelCard } from './panel.js';
+import { createFaceDemo } from './face.js';
 
 const eq = () => h('span', { class: 'eq', 'aria-hidden': 'true' }, h('i'), h('i'), h('i'), h('i'));
 
@@ -178,7 +179,11 @@ function panelPlate(bus) {
   return [createPanelCard(bus, 'lid')];
 }
 
-const PLATES = { island: islandPlate, sound: soundPlate, windows: windowsPlate, command: commandPlate, actions: actionsPlate, auto: autoPlate, chrome: chromePlate, panel: panelPlate };
+function facePlate() {
+  return [createFaceDemo().el, h('p', { class: 'plate-note', text: t('faceNote') })];
+}
+
+const PLATES = { island: islandPlate, face: facePlate, sound: soundPlate, windows: windowsPlate, command: commandPlate, actions: actionsPlate, auto: autoPlate, chrome: chromePlate, panel: panelPlate };
 
 export function renderPlates(bus) {
   for (const [id, build] of Object.entries(PLATES)) {

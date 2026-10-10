@@ -289,6 +289,22 @@ const STRINGS = {
     ],
     islandAction: 'Open the island',
 
+    faceTitle: 'Unlock it with a look.',
+    faceBody: 'Face Unlock brings the Face ID feeling to a MacBook. Lock it, look at it, and the notch scans your face and lets you in, in about a second. It learns how you look, sees you from across the desk and keeps everything on your Mac.',
+    faceRows: [
+      ['faceid', 'In about a second', 'A ring sweeps around the camera, turns green and the Mac opens. Nothing to press: it starts looking a moment after the lock.'],
+      ['eye', 'Only when you look', 'Your eyes have to be open and on the screen. Want more? Ask for a blink too: a photo can’t blink.'],
+      ['sparkle', 'Learns your face', 'Each unlock teaches it your face in new light or with glasses, and only from frames that match your setup scan.'],
+      ['lock', 'Stays on your Mac', 'Your faceprints and your password live in the keychain on this Mac. The camera turns on only while it looks for you.'],
+      ['shield', 'Honest about it', 'A camera sees in 2D, so this is a convenience, not iPhone Face ID. The password is still asked after a restart and every week.']
+    ],
+    faceAction: 'Lock and look',
+    faceNote: 'Locked, scanned, in. About a second.',
+    faceDemoLocale: 'en-US',
+    faceDemoField: 'Enter Password',
+    faceDemoUnlocked: 'Unlocked with your face',
+    faceDemoLabel: 'Face Unlock at the lock screen: a padlock under the notch, a scanning ring around the face, a green check, and the Mac opens',
+
     soundTitle: 'Every app gets its own volume.',
     soundBody: 'Your Mac has one volume for everything. SAVISUL adds a second: each app gets its own level, output and ceiling. Lift a quiet video to 160% and keep music on the speakers while the call goes to your headset.',
     soundKeys: [
@@ -425,7 +441,8 @@ const STRINGS = {
       ['Screen Recording', 'live window previews'],
       ['Audio capture', 'per-app volume'],
       ['Accessibility', 'windows, menus and the Dock'],
-      ['Calendar, Camera, Downloads', 'only when you turn them on']
+      ['Camera', 'the mirror and Face Unlock, only when you turn them on'],
+      ['Calendar, Downloads', 'only when you turn them on']
     ],
     installHelp: 'If it won’t open.txt',
 
@@ -742,6 +759,22 @@ const STRINGS = {
     ],
     islandAction: 'Открыть островок',
 
+    faceTitle: 'Откройте Mac взглядом.',
+    faceBody: 'Вход по лицу приносит на MacBook ощущение Face ID. Заблокируйте Mac, посмотрите на него — чёлка отсканирует лицо и пустит вас примерно за секунду. Он запоминает, как вы выглядите, видит вас через весь стол и хранит всё только на этом Mac.',
+    faceRows: [
+      ['faceid', 'Примерно за секунду', 'Вокруг камеры бежит кольцо, становится зелёным — и Mac открыт. Нажимать ничего не нужно: поиск начинается сразу после блокировки.'],
+      ['eye', 'Только когда вы смотрите', 'Глаза должны быть открыты и смотреть на экран. Хотите строже — включите моргание: фото моргать не умеет.'],
+      ['sparkle', 'Привыкает к вам', 'Каждый вход учит его вашему лицу при другом свете или в очках — и только по кадрам, совпавшим с первоначальным сканом.'],
+      ['lock', 'Остаётся на Mac', 'Данные лица и пароль хранятся в связке ключей этого Mac. Камера включается только на время поиска.'],
+      ['shield', 'Честно о пределах', 'Камера видит плоско, поэтому это удобство, а не Face ID с iPhone. После перезагрузки и раз в неделю пароль всё равно спросят.']
+    ],
+    faceAction: 'Заблокировать и посмотреть',
+    faceNote: 'Заблокирован, отсканирован, открыт. Около секунды.',
+    faceDemoLocale: 'ru-RU',
+    faceDemoField: 'Введите пароль',
+    faceDemoUnlocked: 'Открыто по лицу',
+    faceDemoLabel: 'Вход по лицу на экране блокировки: замочек под чёлкой, кольцо сканирования вокруг лица, зелёная галочка — и Mac открывается',
+
     soundTitle: 'У каждого приложения свой звук.',
     soundBody: 'Громкость Mac одна на всех. SAVISUL добавляет вторую: у каждой программы свой уровень, свой выход и свой потолок. Тихое видео можно поднять до 160%, а музыку оставить в колонках, пока звонок идёт в гарнитуру.',
     soundKeys: [
@@ -878,7 +911,8 @@ const STRINGS = {
       ['Запись экрана', 'живые превью окон'],
       ['Захват звука', 'громкость по приложениям'],
       ['Универсальный доступ', 'окна, меню и Dock'],
-      ['Календарь, камера, «Загрузки»', 'только когда вы их включите']
+      ['Камера', 'зеркало и вход по лицу, только когда вы их включите'],
+      ['Календарь, «Загрузки»', 'только когда вы их включите']
     ],
     installHelp: 'Если не открывается.txt',
 

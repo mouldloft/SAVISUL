@@ -685,6 +685,73 @@ export const FEATURE_GROUPS = [
    }
   ],
   "needs": "nothing"
+ },
+ {
+  "id": "faceUnlock",
+  "symbol": "faceid",
+  "title": {
+   "en": "Face Unlock",
+   "ru": "Вход по лицу",
+   "uk": "Вхід за обличчям",
+   "fr": "Déverrouillage facial"
+  },
+  "detail": {
+   "en": "Unlock this Mac by looking at it.",
+   "ru": "Разблокировка Mac взглядом.",
+   "uk": "Розблокування Mac поглядом.",
+   "fr": "Déverrouillez ce Mac d’un regard."
+  },
+  "main": {
+   "id": "faceUnlock",
+   "key": "faceUnlock",
+   "title": {
+    "en": "Unlock with my face",
+    "ru": "Входить по лицу",
+    "uk": "Входити за обличчям",
+    "fr": "Déverrouiller avec mon visage"
+   },
+   "detail": {
+    "en": "At the lock screen the camera checks it's you and types your password",
+    "ru": "На экране блокировки камера проверяет, что это вы, и вводит пароль",
+    "uk": "На екрані блокування камера перевіряє, що це ви, і вводить пароль",
+    "fr": "À l’écran verrouillé, la caméra vérifie que c’est vous et tape le mot de passe"
+   }
+  },
+  "options": [
+   {
+    "id": "faceUnlockRightAway",
+    "key": "faceUnlockRightAway",
+    "title": {
+     "en": "Look right after locking",
+     "ru": "Искать лицо сразу после блокировки",
+     "uk": "Шукати обличчя одразу після блокування",
+     "fr": "Chercher le visage dès le verrouillage"
+    },
+    "detail": {
+     "en": "Off: a key or a click starts it",
+     "ru": "Если выключить — по клавише или касанию",
+     "uk": "Якщо вимкнути — за клавішею чи дотиком",
+     "fr": "Désactivé : une touche ou un clic le lance"
+    }
+   },
+   {
+    "id": "faceUnlockBlink",
+    "key": "faceUnlockBlink",
+    "title": {
+     "en": "Stricter: wait for a blink",
+     "ru": "Строже: ждать моргания",
+     "uk": "Суворіше: чекати на кліпання",
+     "fr": "Plus strict : attendre un clignement"
+    },
+    "detail": {
+     "en": "A photo can't blink, but unlocking takes a moment longer",
+     "ru": "Фото не умеет моргать, но открывается чуть дольше",
+     "uk": "Фото не вміє кліпати, але відкривається трохи довше",
+     "fr": "Une photo ne cligne pas, mais le déverrouillage prend un instant de plus"
+    }
+   }
+  ],
+  "needs": "accessibility"
  }
 ];
 
@@ -698,6 +765,9 @@ export const FEATURE_DEFAULTS = {
  "dmgTrash": true,
  "dockPreview": true,
  "edgeSnap": false,
+ "faceUnlock": false,
+ "faceUnlockBlink": false,
+ "faceUnlockRightAway": true,
  "finderCut": true,
  "finderImages": true,
  "finderRename": true,

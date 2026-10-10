@@ -716,7 +716,7 @@ function toolsPane(ctx, refresh, actions) {
 
 const FEATURE_SYMBOLS = {
   'capsule.inset.filled': 'capsule', 'speaker.wave.3.fill': 'speakerFill', 'macwindow.on.rectangle': 'window',
-  'doc.on.clipboard.fill': 'clipboard', command: 'command', sparkles: 'sparkles'
+  'doc.on.clipboard.fill': 'clipboard', command: 'command', sparkles: 'sparkles', faceid: 'faceid'
 };
 
 // A switch that sits in two groups counts once, and runs if either place runs it. Mirrors FeatureTally.

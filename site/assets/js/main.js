@@ -5,6 +5,7 @@ import { t, lang, apply, onLang, setLang } from './i18n.js';
 import { CONFIG } from './config.js';
 import { createDesktop } from './desktop.js';
 import { renderPlates } from './plates.js';
+import { playOverDesktop } from './face.js';
 
 const bus = createBus();
 const desktopRoot = document.querySelector('.desktop');
@@ -26,6 +27,7 @@ function keyRows(list) {
 function renderGuide() {
   const fill = (id, node) => { const slot = document.getElementById(id); if (slot) clear(slot).append(node); };
   fill('island-rows', rows(t('islandRows')));
+  fill('face-rows', rows(t('faceRows')));
   fill('sound-keys', keyRows(t('soundKeys')));
   fill('windows-keys', keyRows(t('windowsKeys')));
   fill('clip-keys', keyRows(t('clipKeys')));
@@ -72,6 +74,7 @@ function wire(desktop) {
   // “Show me” scrolls back to the desktop and performs the action there.
   const actions = {
     island: () => desktop.island.expand('home'),
+    face: () => playOverDesktop(desktopRoot),
     sound: () => desktop.openPanel('sound'),
     snap: () => { desktop.openWindow('note'); setTimeout(() => desktop.snap('note', 'left'), 120); },
     command: () => desktop.overlays.openCommand(),

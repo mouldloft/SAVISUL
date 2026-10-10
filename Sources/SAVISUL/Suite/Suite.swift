@@ -29,6 +29,7 @@ final class Suite {
     let automations = AutomationEngine()
     let mixer = Mixer()
     let power = PowerEvents()
+    let faceUnlock = FaceUnlock()
     @ObservationIgnored let windows = WindowsSuite()
     @ObservationIgnored let clipboard = ClipboardSuite()
     @ObservationIgnored let commands = CommandsSuite()
@@ -200,6 +201,7 @@ final class Suite {
         windows.apply(s)
         clipboard.apply(s)
         commands.apply(s)
+        faceUnlock.apply(s.faceUnlock)
     }
 
     /// Expands the island on a tab, turning the island on first if needed.

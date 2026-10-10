@@ -100,7 +100,7 @@ for item in $candidates; do
 done
 
 if [[ -z "$newest" ]]; then
-  print -r -- "SAVISUL не найден. Положите SAVISUL-2.0.dmg в папку «Загрузки» и вставьте команду ещё раз."
+  print -r -- "SAVISUL не найден. Положите образ SAVISUL (.dmg) в папку «Загрузки» и вставьте команду ещё раз."
   exit 1
 fi
 

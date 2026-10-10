@@ -131,7 +131,22 @@ struct FeatureGroup: Identifiable {
             main: FeatureItem(id: "agentsTab", key: \.islandAgents, title: Phrase("Agents in the island", ru: "Агенты в островке", uk: "Агенти в острівці", fr: "Agents dans l’îlot")),
             options: [
                 FeatureItem(id: "agentChime", key: \.agentChime, title: Phrase("Sound when a task finishes", ru: "Звук по окончании задачи", uk: "Звук по завершенні завдання", fr: "Son à la fin d’une tâche"))
-            ])
+            ]),
+        FeatureGroup(
+            id: "faceUnlock", symbol: "faceid", title: Phrase("Face Unlock", ru: "Вход по лицу", uk: "Вхід за обличчям", fr: "Déverrouillage facial"),
+            detail: Phrase("Unlock this Mac by looking at it.", ru: "Разблокировка Mac взглядом.", uk: "Розблокування Mac поглядом.", fr: "Déverrouillez ce Mac d’un regard."),
+            main: FeatureItem(id: "faceUnlock", key: \.faceUnlock, title: Phrase("Unlock with my face", ru: "Входить по лицу", uk: "Входити за обличчям", fr: "Déverrouiller avec mon visage"),
+                              detail: Phrase("At the lock screen the camera checks it's you and types your password", ru: "На экране блокировки камера проверяет, что это вы, и вводит пароль",
+                                             uk: "На екрані блокування камера перевіряє, що це ви, і вводить пароль", fr: "À l’écran verrouillé, la caméra vérifie que c’est vous et tape le mot de passe")),
+            options: [
+                FeatureItem(id: "faceUnlockRightAway", key: \.faceUnlockRightAway,
+                            title: Phrase("Look right after locking", ru: "Искать лицо сразу после блокировки", uk: "Шукати обличчя одразу після блокування", fr: "Chercher le visage dès le verrouillage"),
+                            detail: Phrase("Off: a key or a click starts it", ru: "Если выключить — по клавише или касанию", uk: "Якщо вимкнути — за клавішею чи дотиком", fr: "Désactivé : une touche ou un clic le lance")),
+                FeatureItem(id: "faceUnlockBlink", key: \.faceUnlockBlink, title: Phrase("Stricter: wait for a blink", ru: "Строже: ждать моргания", uk: "Суворіше: чекати на кліпання", fr: "Plus strict : attendre un clignement"),
+                            detail: Phrase("A photo can't blink, but unlocking takes a moment longer", ru: "Фото не умеет моргать, но открывается чуть дольше",
+                                           uk: "Фото не вміє кліпати, але відкривається трохи довше", fr: "Une photo ne cligne pas, mais le déverrouillage prend un instant de plus"))
+            ],
+            needs: .accessibility)
     ]
 }
 
@@ -280,6 +295,10 @@ private struct GroupCard: View {
                     ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
                         OptionRow(item: item, settings: settings, enabled: on)
                         if index < items.count - 1 { Hairline(inset: 0) }
+                    }
+                    if group.id == "faceUnlock" {
+                        Hairline(inset: 0)
+                        FaceUnlockRow(face: Suite.shared.faceUnlock)
                     }
                 }
                 .transition(.opacity.combined(with: .move(edge: .top)))

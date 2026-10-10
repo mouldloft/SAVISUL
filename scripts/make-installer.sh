@@ -43,7 +43,7 @@ chmod +x "$STAGE/Установить SAVISUL.command"
 {
   print -r -- "Если macOS пишет «Файл не был открыт», не удаляйте его."
   print -r -- "Откройте Терминал (Spotlight → Terminal), вставьте весь текст ниже и нажмите Enter."
-  print -r -- "Файл SAVISUL-2.0.dmg должен лежать в папке «Загрузки»."
+  print -r -- "Образ SAVISUL (.dmg) должен лежать в папке «Загрузки»."
   print -r -- ""
   print -r -- "zsh <<'SAVISUL'"
   sed '1d' scripts/open-savisul.zsh
