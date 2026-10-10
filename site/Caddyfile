@@ -22,6 +22,10 @@
 	@html path *.html /
 	header @html Cache-Control "public, max-age=300"
 
+	# Scripts stay cached for a week, so a returning browser can still link the previous release.
+	redir /download/SAVISUL-2.0.dmg /download/SAVISUL-2.1.dmg
+	redir /download/SAVISUL-2.0.zip /download/SAVISUL-2.1.zip
+
 	try_files {path} {path}.html
 	file_server
 
