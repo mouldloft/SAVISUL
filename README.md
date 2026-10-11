@@ -233,14 +233,32 @@ SAVISUL is built around a unified Actions Engine. Every action describes its inp
 
 SAVISUL runs on macOS 14.2 or later on a Mac with Apple silicon.
 
-1. Download [SAVISUL-2.1.dmg](https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.1.dmg) from [Releases](https://github.com/mouldloft/SAVISUL/releases/latest) or the [website](https://www.savisul.com)
-2. Drag SAVISUL into Applications
-3. Open SAVISUL
-4. Grant only the permissions required by the features you use
+> [!NOTE]
+> SAVISUL isn't signed with an Apple Developer ID or notarized by Apple yet, so macOS blocks it the first time you open it. One line in Terminal fixes that, once. A signed and notarized build is coming soon; then SAVISUL will open with a double-click like any other app.
 
-SAVISUL is in beta. The build is signed locally and not notarized by Apple, so on first launch macOS may say the file was not opened. Open **System Settings → Privacy & Security → Open Anyway**.
+<p align="center">
+  <img src="docs/readme/install.gif" alt="Installing SAVISUL: drag it from the disk image into Applications; macOS says it was not opened; open Terminal with Command-Space, paste one line and press Return; SAVISUL opens" width="880">
+</p>
 
-If that button is missing, open the disk image and double-click **Установить SAVISUL.command**. It copies SAVISUL to Applications, clears the quarantine flag and opens it. To do the same from Terminal, follow [If it won't open.txt](site/download/If%20it%20won't%20open.txt).
+1. Download [SAVISUL-2.1.dmg](https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.1.dmg) from [Releases](https://github.com/mouldloft/SAVISUL/releases/latest) or the [website](https://www.savisul.com).
+2. Open the disk image and drag **SAVISUL** into **Applications**.
+3. Open **Terminal**: press <kbd>⌘</kbd> <kbd>Space</kbd>, type `Terminal` and press <kbd>Return</kbd>. Paste this line and press <kbd>Return</kbd>:
+
+   ```sh
+   xattr -cr /Applications/SAVISUL.app
+   ```
+
+   It removes the "downloaded from the internet" flag that makes macOS refuse apps it hasn't checked. When it works, it prints nothing.
+4. Open SAVISUL from Applications. Grant only the permissions required by the features you use.
+
+<details>
+<summary>Other ways past the warning</summary>
+
+- Right after macOS refuses to open SAVISUL, open **System Settings → Privacy & Security** and click **Open Anyway**.
+- In the disk image, double-click **Установить SAVISUL.command** ("Install SAVISUL"). It copies SAVISUL to Applications, clears the flag and opens it.
+- [If it won't open.txt](site/download/If%20it%20won't%20open.txt) holds a longer Terminal script that finds the disk image in Downloads and does all of the above.
+
+</details>
 
 ### Build from source
 
@@ -345,7 +363,7 @@ No. iPhone Face ID has a 3D infrared camera; a Mac has an ordinary one, so a goo
 <details>
 <summary><b>Why does macOS say the app can't be opened?</b></summary>
 
-The build is signed locally and not notarized by Apple. [Installation](#installation) shows the two ways past it.
+SAVISUL isn't notarized by Apple yet. Paste `xattr -cr /Applications/SAVISUL.app` into Terminal once, as [Installation](#installation) shows. A signed and notarized build is coming soon.
 
 </details>
 
