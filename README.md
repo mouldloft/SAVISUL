@@ -237,11 +237,11 @@ SAVISUL runs on macOS 14.2 or later on a Mac with Apple silicon.
 > SAVISUL isn't signed with an Apple Developer ID or notarized by Apple yet, so macOS blocks it the first time you open it. One line in Terminal fixes that, once. A signed and notarized build is coming soon; then SAVISUL will open with a double-click like any other app.
 
 <p align="center">
-  <img src="docs/readme/install.gif" alt="Installing SAVISUL: drag it from the disk image into Applications; macOS says it was not opened; open Terminal with Command-Space, paste one line and press Return; SAVISUL opens" width="880">
+  <img src="docs/readme/install.gif" alt="Installing SAVISUL in four steps: download the disk image from Releases, drag SAVISUL into Applications, paste one line into Terminal after macOS blocks the first launch, then open SAVISUL" width="880">
 </p>
 
 1. Download [SAVISUL-2.1.dmg](https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.1.dmg) from [Releases](https://github.com/mouldloft/SAVISUL/releases/latest) or the [website](https://www.savisul.com).
-2. Open the disk image and drag **SAVISUL** into **Applications**.
+2. Open the disk image and drag **SAVISUL** into **Applications** in the Finder sidebar.
 3. Open **Terminal**: press <kbd>⌘</kbd> <kbd>Space</kbd>, type `Terminal` and press <kbd>Return</kbd>. Paste this line and press <kbd>Return</kbd>:
 
    ```sh
@@ -254,9 +254,10 @@ SAVISUL runs on macOS 14.2 or later on a Mac with Apple silicon.
 <details>
 <summary>Other ways past the warning</summary>
 
-- Right after macOS refuses to open SAVISUL, open **System Settings → Privacy & Security** and click **Open Anyway**.
-- In the disk image, double-click **Установить SAVISUL.command** ("Install SAVISUL"). It copies SAVISUL to Applications, clears the flag and opens it.
-- [If it won't open.txt](site/download/If%20it%20won't%20open.txt) holds a longer Terminal script that finds the disk image in Downloads and does all of the above.
+- Right after macOS refuses to open SAVISUL, open **System Settings → Privacy & Security**, click **Open Anyway** and confirm with your password.
+- [If it won't open.txt](site/download/If%20it%20won't%20open.txt) holds a longer Terminal script: it finds the disk image in Downloads, copies SAVISUL into Applications, clears the flag and opens it.
+
+The disk image also holds **Установить SAVISUL.command** and **Если не открывается.txt**, the Russian versions of that helper and script. macOS blocks the helper the same way it blocks the app, so use the Terminal line instead.
 
 </details>
 
