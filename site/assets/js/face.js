@@ -52,7 +52,7 @@ export function createFaceDemo({ live = true } = {}) {
   const date = now.toLocaleDateString(t('faceDemoLocale'), { weekday: 'long', month: 'long', day: 'numeric' });
   const lock = h('div', { class: 'fd-lock' },
     h('p', { class: 'fd-date', text: date }),
-    h('p', { class: 'fd-time', text: '9:41' }),
+    h('p', { class: 'fd-time', text: '18:23' }),
     h('div', { class: 'fd-user' }, h('span', { class: 'fd-avatar' }, icon('user', 22)), h('span', { class: 'fd-field', text: t('faceDemoField') })));
   const window1 = h('div', { class: 'fd-window one' }, h('i'), h('b'), h('b'), h('b'));
   const window2 = h('div', { class: 'fd-window two' }, h('i'), h('b'), h('b'));
