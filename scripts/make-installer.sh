@@ -50,6 +50,9 @@ chmod +x "$STAGE/Установить SAVISUL.command"
   print -r -- "SAVISUL"
 } > "$STAGE/Если не открывается.txt"
 cp "$BACKGROUND" "$STAGE/.background/background.png"
+swiftc -O -framework AppKit -sdk "$PWD/.build/MacOSX.sdk" -vfsoverlay "$PWD/.build/overlay.json" \
+  -module-cache-path "$PWD/.build/module-cache" -o "$PWD/.build/dmg-icons" scripts/dmg_icons.swift
+"$PWD/.build/dmg-icons" "$STAGE/Установить SAVISUL.command" "$STAGE/Если не открывается.txt"
 cp "$APP/Contents/Resources/AppIcon.icns" "$STAGE/.VolumeIcon.icns"
 
 if [[ -d "$MOUNT" ]]; then
@@ -61,6 +64,9 @@ hdiutil attach -readwrite -noverify -noautoopen -mountpoint "$MOUNT" "$RW" >/dev
 
 cp -R "$STAGE"/. "$MOUNT"/
 chflags hidden "$MOUNT/.background" "$MOUNT/.VolumeIcon.icns"
+# The helper files show without their extensions, so the row reads SAVISUL, Установить SAVISUL, Если не открывается.
+/Library/Developer/CommandLineTools/usr/bin/SetFile -a E "$MOUNT/Установить SAVISUL.command"
+/Library/Developer/CommandLineTools/usr/bin/SetFile -a E "$MOUNT/Если не открывается.txt"
 /Library/Developer/CommandLineTools/usr/bin/SetFile -a C "$MOUNT"
 
 osascript << EOF
@@ -72,15 +78,15 @@ tell application "Finder"
     set current view of theWindow to icon view
     set toolbar visible of theWindow to false
     set statusbar visible of theWindow to false
-    set bounds of theWindow to {200, 120, 920, 580}
+    set bounds of theWindow to {200, 120, 920, 588}
     set theOptions to icon view options of theWindow
     set arrangement of theOptions to not arranged
-    set icon size of theOptions to 104
-    set text size of theOptions to 13
+    set icon size of theOptions to 96
+    set text size of theOptions to 12
     set background picture of theOptions to file ".background:background.png"
-    set position of item "SAVISUL.app" of theWindow to {160, 214}
-    set position of item "Установить SAVISUL.command" of theWindow to {360, 214}
-    set position of item "Если не открывается.txt" of theWindow to {560, 214}
+    set position of item "SAVISUL.app" of theWindow to {180, 206}
+    set position of item "Установить SAVISUL.command" of theWindow to {360, 206}
+    set position of item "Если не открывается.txt" of theWindow to {540, 206}
     update without registering applications
     delay 1
     close
