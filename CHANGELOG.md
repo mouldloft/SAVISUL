@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.3
+
+### New
+
+- SAVISUL updates itself. When a new version is out the island offers it, and Settings → Updates has the button: it downloads the release, checks that it is signed by SAVISUL, puts it in place of the old one and reopens. No new DMG, no Terminal.
+
+### Better
+
+- Permissions survive updates. Releases keep SAVISUL's own certificate signature, which stays the same from version to version, so macOS no longer forgets Accessibility, Screen Recording and the rest after an update. Coming from 2.1 or earlier, macOS asks for them one last time.
+- A neater installer: one even row with the app, the install command and the help file, on a sharp Retina background.
+
+### Download
+
+[SAVISUL-2.3.dmg](https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.3.dmg) for macOS 14.2 or later on Apple silicon.
+
+The build is signed with SAVISUL's own certificate and is not notarized. See the installation notes in the README.
+
 ## 2.2
 
 ### New
@@ -13,7 +30,7 @@
 
 ### Download
 
-[SAVISUL-2.2.dmg](https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.2.dmg) for macOS 14.2 or later on Apple silicon.
+[SAVISUL-2.2.dmg](https://github.com/mouldloft/SAVISUL/releases/download/v2.2/SAVISUL-2.2.dmg) for macOS 14.2 or later on Apple silicon.
 
 The build is signed locally and is not notarized. See the installation notes in the README.
 

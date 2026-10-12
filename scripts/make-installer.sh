@@ -28,14 +28,14 @@ swiftc -O -framework AppKit \
 rm -rf "$STAGE"
 mkdir -p "$STAGE/.background"
 ditto "$APP" "$STAGE/SAVISUL.app"
-# The build certificate lives only in this Mac's keychain. On another Mac,
-# Gatekeeper treats that signature as broken and reports the app as damaged,
-# with no "Open Anyway" button. An ad-hoc signature is what macOS lets a
-# person approve once in Privacy & Security.
-MEDIA="$STAGE/SAVISUL.app/Contents/Frameworks/libSAVISULMedia.dylib"
-codesign --force --sign - "$MEDIA"
-codesign --force --sign - --identifier "com.savisul.menu" "$STAGE/SAVISUL.app"
+# The build keeps the SAVISUL certificate's signature. It is the same from release to release, so macOS keeps
+# the permissions a person gave SAVISUL across updates, and the in-app updater accepts only builds that carry it.
+# Gatekeeper never judges it: the install command and the updater both leave the quarantine check out.
 codesign --verify --strict "$STAGE/SAVISUL.app"
+if ! codesign -dr - "$STAGE/SAVISUL.app" 2>&1 | grep -q 'certificate root'; then
+  echo "SAVISUL.app is not signed with the SAVISUL certificate; run scripts/signing.sh first." >&2
+  exit 1
+fi
 # macOS 26 refuses a downloaded app and shows no "Open Anyway" button.
 # The same steps pasted into Terminal are not checked by Gatekeeper.
 cp scripts/open-savisul.zsh "$STAGE/Установить SAVISUL.command"
@@ -56,7 +56,7 @@ if [[ -d "$MOUNT" ]]; then
   hdiutil detach "$MOUNT" -force >/dev/null 2>&1 || true
 fi
 rm -f "$RW" "$DMG"
-hdiutil create -size 48m -fs HFS+ -volname "SAVISUL" -o "$RW" >/dev/null
+hdiutil create -size 96m -fs HFS+ -volname "SAVISUL" -o "$RW" >/dev/null
 hdiutil attach -readwrite -noverify -noautoopen -mountpoint "$MOUNT" "$RW" >/dev/null
 
 cp -R "$STAGE"/. "$MOUNT"/
@@ -72,15 +72,15 @@ tell application "Finder"
     set current view of theWindow to icon view
     set toolbar visible of theWindow to false
     set statusbar visible of theWindow to false
-    set bounds of theWindow to {240, 140, 920, 580}
+    set bounds of theWindow to {200, 120, 920, 580}
     set theOptions to icon view options of theWindow
     set arrangement of theOptions to not arranged
-    set icon size of theOptions to 96
-    set text size of theOptions to 12
+    set icon size of theOptions to 104
+    set text size of theOptions to 13
     set background picture of theOptions to file ".background:background.png"
-    set position of item "SAVISUL.app" of theWindow to {150, 175}
-    set position of item "Установить SAVISUL.command" of theWindow to {340, 175}
-    set position of item "Если не открывается.txt" of theWindow to {520, 175}
+    set position of item "SAVISUL.app" of theWindow to {160, 214}
+    set position of item "Установить SAVISUL.command" of theWindow to {360, 214}
+    set position of item "Если не открывается.txt" of theWindow to {560, 214}
     update without registering applications
     delay 1
     close

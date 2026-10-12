@@ -9,6 +9,7 @@ struct SettingsPane: View {
             LanguageCard(model: model)
             GeneralCard(model: model)
             WallpaperCard(model: model)
+            UpdateCard()
             AICard()
             PermissionsCard(model: model)
             AboutFooter(model: model)
@@ -126,6 +127,45 @@ private struct WallpaperCard: View {
             .font(.system(size: 11, weight: .semibold))
             .foregroundStyle(Palette.tertiary)
             .padding(.bottom, 6)
+    }
+}
+
+private struct UpdateCard: View {
+    var body: some View {
+        let updater = Updater.shared
+        VStack(alignment: .leading, spacing: 10) {
+            CardTitle(UpdatePhrases.title.text)
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("\(UpdatePhrases.version.text) \(updater.current)")
+                        .font(.system(size: 13.5, weight: .medium))
+                        .foregroundStyle(Palette.ink)
+                    Text(status(updater.state))
+                        .font(.system(size: 11.5))
+                        .foregroundStyle(Palette.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 10)
+                if case .available = updater.state {
+                    PillButton(title: UpdatePhrases.update.text, prominent: true) { updater.install() }
+                } else if !updater.busy {
+                    PillButton(title: UpdatePhrases.check.text, prominent: false) { updater.check() }
+                }
+            }
+        }
+        .card()
+    }
+
+    private func status(_ state: Updater.State) -> String {
+        switch state {
+        case .idle: UpdatePhrases.detail.text
+        case .checking: UpdatePhrases.checking.text
+        case .upToDate: UpdatePhrases.upToDate.text
+        case .failed: UpdatePhrases.failed.text
+        case let .available(version): UpdatePhrases.available.text + " " + version
+        case let .downloading(version): UpdatePhrases.downloading.text + " " + version + "…"
+        case .installing: UpdatePhrases.installing.text
+        }
     }
 }
 

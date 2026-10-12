@@ -18,7 +18,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.2.dmg"><img src="https://img.shields.io/badge/Download-SAVISUL%202.2-DBC7A3?style=for-the-badge&logo=apple&logoColor=DBC7A3&labelColor=17130E" alt="Download SAVISUL 2.2" height="36"></a>
+  <a href="https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.3.dmg"><img src="https://img.shields.io/badge/Download-SAVISUL%202.3-DBC7A3?style=for-the-badge&logo=apple&logoColor=DBC7A3&labelColor=17130E" alt="Download SAVISUL 2.3" height="36"></a>
 </p>
 
 <p align="center">
@@ -244,7 +244,7 @@ SAVISUL runs on macOS 14.2 or later on a Mac with Apple silicon.
   <img src="docs/readme/install.gif" alt="Installing SAVISUL in four steps: download the disk image from Releases, drag SAVISUL into Applications, paste one line into Terminal after macOS blocks the first launch, then open SAVISUL" width="880">
 </p>
 
-1. Download [SAVISUL-2.2.dmg](https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.2.dmg) from [Releases](https://github.com/mouldloft/SAVISUL/releases/latest) or the [website](https://www.savisul.com).
+1. Download [SAVISUL-2.3.dmg](https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.3.dmg) from [Releases](https://github.com/mouldloft/SAVISUL/releases/latest) or the [website](https://www.savisul.com).
 2. Open the disk image and drag **SAVISUL** into **Applications** in the Finder sidebar.
 3. Open **Terminal**: press <kbd>⌘</kbd> <kbd>Space</kbd>, type `Terminal` and press <kbd>Return</kbd>. Paste this line and press <kbd>Return</kbd>:
 
@@ -264,6 +264,8 @@ SAVISUL runs on macOS 14.2 or later on a Mac with Apple silicon.
 The disk image also holds **Установить SAVISUL.command** and **Если не открывается.txt**, the Russian versions of that helper and script. macOS blocks the helper the same way it blocks the app, so use the Terminal line instead.
 
 </details>
+
+After that SAVISUL updates itself: when a new version is out it offers it on the island and in **Settings → Updates**, installs it in place and keeps its permissions.
 
 ### Build from source
 

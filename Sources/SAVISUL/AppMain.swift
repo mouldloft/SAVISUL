@@ -73,6 +73,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         controller.start(showPanel: !launchedAtLogin && !background)
         LiveWallpaper.shared.start()
+        Updater.shared.start()
         SingleInstance.listen { [weak controller] in controller?.show() }
         let bridge = BridgeServer(model: model)
         bridge.onOpen = { [weak controller] in controller?.show() }
