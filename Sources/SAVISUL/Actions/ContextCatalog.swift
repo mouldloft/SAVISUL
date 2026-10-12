@@ -86,11 +86,11 @@ enum ContextCatalog {
             },
             ai("ai.page", Phrase("Summarize page", ru: "Пересказать страницу", uk: "Переказати сторінку", fr: "Résumer la page"), "doc.richtext",
                accepts: [.url], system: "Summarize this web page in a few short bullet points: what it is and what matters in it. Reply in \(AIService.languageName). No preamble.",
-               keywords: ["page", "article", "статья"]) { context, run in
+               keywords: ["page", "article", "статья"], source: { context, run in
                 guard let url = context.url else { return "" }
                 run.progress(nil, url.host)
                 return try await WebPage.text(url)
-            },
+            }),
             ActionDefinition(id: "url.copy", title: Phrase("Copy link", ru: "Скопировать ссылку", uk: "Скопіювати посилання", fr: "Copier le lien"),
                              symbol: "link", accepts: [.url]) { context, _, _ in
                 Clipboard.copy(context.url?.absoluteString ?? "")

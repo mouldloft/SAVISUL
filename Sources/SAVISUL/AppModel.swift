@@ -96,6 +96,9 @@ final class AppModel {
     @ObservationIgnored private var toastTask: Task<Void, Never>?
     @ObservationIgnored private var formatters: [String: NumberFormatter] = [:]
     @ObservationIgnored private let defaults = UserDefaults.standard
+    /// Set by the panel controller: moves the panel with the pointer, and resizes it to a size the panel clamps.
+    @ObservationIgnored var dragPanel: (() -> Void)?
+    @ObservationIgnored var resizePanel: ((CGSize) -> Void)?
 
     init(preview: Bool = false) {
         self.preview = preview

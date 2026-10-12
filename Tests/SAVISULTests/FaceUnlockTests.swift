@@ -190,6 +190,29 @@ private func frame(_ print: [Float], eyes: Double? = 0.3) -> FaceFrame {
     #expect(!unlocked.shouldScan(activityAt: now.addingTimeInterval(9), now: now.addingTimeInterval(9)))
 }
 
+@Test func closeFacesWithoutEyesDontCountAsLooking() {
+    var close = FaceMatch(prints: [owner], needsBlink: false)
+    for _ in 0..<3 { close.add(FaceFrame(print: owner, eyes: nil, size: 0.3)) }
+    #expect(!close.accepted)
+    #expect(close.notLooking == 3)
+    // Across the desk the eyes are a few pixels and sometimes not found at all; that still counts.
+    var far = FaceMatch(prints: [owner], needsBlink: false)
+    for _ in 0..<3 { far.add(FaceFrame(print: owner, eyes: nil, size: 0.07)) }
+    #expect(far.accepted)
+}
+
+@Test func onlyARecentWorkingPasswordCountsAsOpenedByFace() {
+    let now = Date(timeIntervalSinceReferenceDate: 800_000_000)
+    #expect(!UnlockPolicy.openedByFace(typedAt: nil, typingFailed: false, now: now))
+    #expect(UnlockPolicy.openedByFace(typedAt: now.addingTimeInterval(-1), typingFailed: false, now: now))
+    // The lock screen took five seconds to open once, the first time after sleep.
+    #expect(UnlockPolicy.openedByFace(typedAt: now.addingTimeInterval(-5), typingFailed: false, now: now))
+    // Typing was found to have failed, so the person opened it with their own password.
+    #expect(!UnlockPolicy.openedByFace(typedAt: now.addingTimeInterval(-5), typingFailed: true, now: now))
+    #expect(!UnlockPolicy.openedByFace(typedAt: now.addingTimeInterval(-30), typingFailed: false, now: now))
+    #expect(UnlockPolicy.typingSettles >= 5)
+}
+
 @Test func thePasswordIsNeededAfterAWeekOrFiveStrangers() {
     let now = Date(timeIntervalSinceReferenceDate: 800_000_000)
     #expect(!UnlockPolicy(lastPasswordUnlock: now.addingTimeInterval(-24 * 3600)).passwordNeeded(now: now))

@@ -111,7 +111,8 @@ final class LockIsland {
 
     /// Centered on the notch of the built-in display, or on the top of the main one.
     private func place(_ panel: NSPanel) {
-        let screen = ScreenSpace.notchScreen ?? NSScreen.main ?? NSScreen.screens[0]
+        // While displays are being swapped macOS can have no screen at all for a moment.
+        guard let screen = ScreenSpace.notchScreen ?? NSScreen.main ?? NSScreen.screens.first else { return }
         var center = screen.frame.midX
         if let left = screen.auxiliaryTopLeftArea, let right = screen.auxiliaryTopRightArea, screen.safeAreaInsets.top > 0 {
             notch = CGSize(width: max(right.minX - left.maxX, 120), height: screen.safeAreaInsets.top)

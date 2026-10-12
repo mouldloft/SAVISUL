@@ -176,7 +176,8 @@ struct FaceMatch {
     /// Eyes open, both as such and next to how wide they opened during this scan. A far face's eyes are a few pixels
     /// and measured loosely, so they are judged more gently.
     private func looking(_ eyes: Double?, far: Bool) -> Bool {
-        guard let eyes else { return true }
+        // Up close the eyes are always found when someone looks; not finding them is no proof of attention.
+        guard let eyes else { return far }
         return eyes >= (far ? 0.08 : Self.openEyes) && eyes >= widestEyes * (far ? 0.45 : 0.6)
     }
 

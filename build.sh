@@ -68,6 +68,7 @@ swiftc -parse-as-library \
   -framework Accelerate \
   -framework CoreMedia \
   -framework CoreMediaIO \
+  -framework SpriteKit \
   Sources/SAVISUL/**/*.swift \
   .build/smc_bridge.o \
   -o .build/SAVISUL
@@ -93,6 +94,7 @@ cp .build/libSAVISULMedia.dylib "$APP/Contents/Frameworks/libSAVISULMedia.dylib"
 cp .build/savisul-fan-helper "$APP/Contents/Resources/savisul-fan-helper"
 chmod 755 "$APP/Contents/Resources/savisul-fan-helper"
 cp Info.plist "$APP/Contents/Info.plist"
+cp Resources/Wallpapers/*.heic "$APP/Contents/Resources/"
 chmod +x "$APP/Contents/MacOS/SAVISUL"
 .build/SAVISUL --render-icon .build/AppIcon.iconset
 iconutil -c icns .build/AppIcon.iconset -o "$APP/Contents/Resources/AppIcon.icns"

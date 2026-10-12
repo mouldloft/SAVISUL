@@ -38,6 +38,7 @@ let package = Package(
                 .linkedFramework("ScreenCaptureKit"),
                 .linkedFramework("Accelerate"),
                 .linkedFramework("CoreMedia"),
+                .linkedFramework("SpriteKit"),
                 .linkedFramework("CoreMediaIO")
             ]
         ),

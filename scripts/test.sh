@@ -33,7 +33,7 @@ frameworks=(
   -framework ServiceManagement -framework CoreGraphics -framework Carbon
   -framework QuickLookThumbnailing -framework UniformTypeIdentifiers -framework EventKit
   -framework AVFoundation -framework ScreenCaptureKit -framework Accelerate
-  -framework CoreMedia -framework CoreMediaIO
+  -framework CoreMedia -framework CoreMediaIO -framework SpriteKit
 )
 common=(
   -target arm64-apple-macos14.2

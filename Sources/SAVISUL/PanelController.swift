@@ -48,6 +48,7 @@ final class PanelController: NSObject {
         model.start()
         installStatusItem()
         panel = makePanel(backdrop: false)
+        if let panel { enableMoveAndResize(panel) }
         MainMenu.install(controller: self, model: model)
         HotKey.onPress = { [weak self] in
             MainActor.assumeIsolated { self?.toggle() }
@@ -173,9 +174,10 @@ final class PanelController: NSObject {
     // MARK: Panel
 
     private func makePanel(backdrop: Bool) -> PopupPanel {
-        let size = NSSize(width: Metrics.panelWidth, height: Metrics.panelHeight)
+        let size = backdrop ? NSSize(width: Metrics.panelWidth, height: Metrics.panelHeight) : PanelPlacement.size
         let panel = PopupPanel(size: size)
         let host = NSHostingView(rootView: RootView(model: model, backdrop: backdrop))
+        host.sizingOptions = []
         host.frame = NSRect(origin: .zero, size: size)
         host.autoresizingMask = [.width, .height]
         if backdrop {
@@ -244,6 +246,74 @@ final class PanelController: NSObject {
     }
 
     private func targetFrame(for panel: NSPanel) -> NSRect {
+        // Where the person left it, kept on a screen that still exists; otherwise under the menu bar icon.
+        let size = panel.frame.size
+        if let topLeft = PanelPlacement.topLeft {
+            let frame = NSRect(x: topLeft.x, y: topLeft.y - size.height, width: size.width, height: size.height)
+            if let visible = NSScreen.screens.first(where: { $0.visibleFrame.intersects(frame) })?.visibleFrame {
+                return NSRect(x: min(max(frame.minX, visible.minX), visible.maxX - size.width),
+                              y: min(max(frame.minY, visible.minY), visible.maxY - size.height), width: size.width, height: size.height)
+            }
+        }
+        return homeFrame(for: panel)
+    }
+
+    // MARK: Moving and resizing
+
+    private var settleTimer: Timer?
+    private var dragging = false
+
+    private func enableMoveAndResize(_ panel: PopupPanel) {
+        model.dragPanel = { [weak self, weak panel] in
+            guard let self, let panel, !self.dragging, let event = NSApp.currentEvent else { return }
+            self.dragging = true
+            panel.performDrag(with: event)
+            // Settles once the button is up, even if the panel never moved, so the next drag is not ignored.
+            self.panelMoved()
+        }
+        model.resizePanel = { [weak self] size in self?.resize(to: size) }
+        NotificationCenter.default.addObserver(forName: NSWindow.didMoveNotification, object: panel, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { self?.panelMoved() }
+        }
+    }
+
+    private func resize(to proposed: CGSize) {
+        guard let panel else { return }
+        let visible = (panel.screen ?? NSScreen.main)?.visibleFrame ?? .zero
+        let width = min(max(proposed.width, Metrics.panelWidth), Metrics.panelMaxSize.width)
+        let height = min(max(proposed.height, Metrics.panelMinHeight), min(Metrics.panelMaxSize.height, panel.frame.maxY - visible.minY - 8))
+        // The top-left corner stays put, as when a window is resized by its bottom-right corner.
+        panel.setFrame(NSRect(x: panel.frame.minX, y: panel.frame.maxY - height, width: width, height: height), display: true)
+        panel.invalidateShadow()
+        PanelPlacement.size = NSSize(width: width, height: height)
+    }
+
+    private func panelMoved() {
+        guard dragging || NSEvent.pressedMouseButtons & 1 != 0 else { return }
+        settleTimer?.invalidate()
+        settleTimer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: false) { [weak self] _ in
+            MainActor.assumeIsolated { self?.panelSettled() }
+        }
+    }
+
+    /// Once a drag ends the panel stays where it was put; brought back near the menu bar icon it docks there again.
+    private func panelSettled() {
+        guard let panel else { return }
+        if NSEvent.pressedMouseButtons & 1 != 0 { panelMoved(); return }
+        dragging = false
+        let home = homeFrame(for: panel)
+        if hypot(panel.frame.minX - home.minX, panel.frame.maxY - home.maxY) < 44 {
+            PanelPlacement.topLeft = nil
+            NSAnimationContext.runAnimationGroup { context in
+                context.duration = 0.18
+                panel.animator().setFrame(home, display: true)
+            }
+        } else {
+            PanelPlacement.topLeft = NSPoint(x: panel.frame.minX, y: panel.frame.maxY)
+        }
+    }
+
+    private func homeFrame(for panel: NSPanel) -> NSRect {
         let size = panel.frame.size
         if model.statusVisible, let button = statusItem?.button, let window = button.window {
             let anchor = window.convertToScreen(button.convert(button.bounds, to: nil))
@@ -420,5 +490,41 @@ enum LaunchContext {
     static func isLoginLaunch() -> Bool {
         guard let event = NSAppleEventManager.shared().currentAppleEvent, event.eventID == 0x6F61_7070 else { return false }
         return event.paramDescriptor(forKeyword: 0x7072_6474)?.enumCodeValue == 0x6C67_6974
+    }
+}
+
+/// The panel's size and the place it was moved to, kept across launches. No place means under the menu bar icon.
+@MainActor
+enum PanelPlacement {
+    static var size: NSSize {
+        get {
+            let store = SettingsDefaults.store
+            let width = store.double(forKey: "panelWidth"), height = store.double(forKey: "panelHeight")
+            guard width > 0, height > 0 else { return NSSize(width: Metrics.panelWidth, height: Metrics.panelHeight) }
+            return NSSize(width: min(max(width, Metrics.panelWidth), Metrics.panelMaxSize.width),
+                          height: min(max(height, Metrics.panelMinHeight), Metrics.panelMaxSize.height))
+        }
+        set {
+            SettingsDefaults.store.set(Double(newValue.width), forKey: "panelWidth")
+            SettingsDefaults.store.set(Double(newValue.height), forKey: "panelHeight")
+        }
+    }
+
+    static var topLeft: NSPoint? {
+        get {
+            let store = SettingsDefaults.store
+            guard store.object(forKey: "panelLeft") != nil else { return nil }
+            return NSPoint(x: store.double(forKey: "panelLeft"), y: store.double(forKey: "panelTop"))
+        }
+        set {
+            let store = SettingsDefaults.store
+            if let newValue {
+                store.set(Double(newValue.x), forKey: "panelLeft")
+                store.set(Double(newValue.y), forKey: "panelTop")
+            } else {
+                store.removeObject(forKey: "panelLeft")
+                store.removeObject(forKey: "panelTop")
+            }
+        }
     }
 }

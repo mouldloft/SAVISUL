@@ -18,7 +18,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.1.dmg"><img src="https://img.shields.io/badge/Download-SAVISUL%202.1-DBC7A3?style=for-the-badge&logo=apple&logoColor=DBC7A3&labelColor=17130E" alt="Download SAVISUL 2.1" height="36"></a>
+  <a href="https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.2.dmg"><img src="https://img.shields.io/badge/Download-SAVISUL%202.2-DBC7A3?style=for-the-badge&logo=apple&logoColor=DBC7A3&labelColor=17130E" alt="Download SAVISUL 2.2" height="36"></a>
 </p>
 
 <p align="center">
@@ -128,6 +128,10 @@ It talks to the Mac app, so a page, an image or a selection goes straight into a
 <p align="center">
   <img src="docs/readme/browser.png" alt="The browser extension's notch open over a sample article, with its tools, page actions and browser shortcuts" width="880">
 </p>
+
+## Live wallpaper
+
+Sakura that never loops, drawn live behind SAVISUL's panel, on the desktop, or both. Three scenes: a bonsai, a cherry tree on a grassy hill under snowy mountains, and a bonsai on a hilltop, each with a painting made for the panel and one for the desktop. Petals fall from the tree on a breeze that never repeats, the crown sways and the grass moves. With **The pointer brings it to life** on, the wallpaper glows under the pointer, petals drift away from it and the grass rustles where it passes. Settings → Live wallpaper.
 
 ## Everyday tools
 
@@ -240,7 +244,7 @@ SAVISUL runs on macOS 14.2 or later on a Mac with Apple silicon.
   <img src="docs/readme/install.gif" alt="Installing SAVISUL in four steps: download the disk image from Releases, drag SAVISUL into Applications, paste one line into Terminal after macOS blocks the first launch, then open SAVISUL" width="880">
 </p>
 
-1. Download [SAVISUL-2.1.dmg](https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.1.dmg) from [Releases](https://github.com/mouldloft/SAVISUL/releases/latest) or the [website](https://www.savisul.com).
+1. Download [SAVISUL-2.2.dmg](https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.2.dmg) from [Releases](https://github.com/mouldloft/SAVISUL/releases/latest) or the [website](https://www.savisul.com).
 2. Open the disk image and drag **SAVISUL** into **Applications** in the Finder sidebar.
 3. Open **Terminal**: press <kbd>⌘</kbd> <kbd>Space</kbd>, type `Terminal` and press <kbd>Return</kbd>. Paste this line and press <kbd>Return</kbd>:
 

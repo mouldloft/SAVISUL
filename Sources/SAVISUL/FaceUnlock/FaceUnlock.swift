@@ -1,4 +1,6 @@
 import AppKit
+import AVFoundation
+import ServiceManagement
 import Foundation
 import Observation
 
@@ -16,6 +18,9 @@ final class FaceUnlock {
     @ObservationIgnored private var running = false
     /// Waiting for the keychain, which after an update waits for the person to allow this build.
     @ObservationIgnored private var loading = false
+    /// Which start a keychain answer belongs to. Off and on again while macOS asks would otherwise deliver two answers,
+    /// and each would add its own lock and unlock observers.
+    @ObservationIgnored private var generation = 0
     @ObservationIgnored private var firstApply = true
     @ObservationIgnored private var observers: [(NotificationCenter, NSObjectProtocol)] = []
     @ObservationIgnored private var poll: Timer?
@@ -99,19 +104,55 @@ final class FaceUnlock {
         guard !running else { return }
         running = true
         loading = true
+        generation += 1
+        let current = generation
         policy.lastPasswordUnlock = UserDefaults.standard.object(forKey: Self.passwordUsedKey) as? Date
         // After an update macOS asks once whether this build may read the keychain item, and waits for an answer,
         // so the read happens off the main thread. Asked now, while the person is here; at the lock screen nobody could.
         DispatchQueue.global(qos: .userInitiated).async {
             let result = FaceVault.load(prompt: true)
-            DispatchQueue.main.async { MainActor.assumeIsolated { self.loaded(result) } }
+            DispatchQueue.main.async {
+                MainActor.assumeIsolated {
+                    guard self.generation == current else { return }
+                    self.loaded(result)
+                }
+            }
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 8) { [weak self] in
             MainActor.assumeIsolated {
-                guard let self, self.running, self.loading else { return }
+                guard let self, self.running, self.loading, self.generation == current else { return }
                 FaceLog.write("waiting for keychain access")
                 self.askForAccess(waiting: true)
             }
+        }
+        // Everything the lock screen will need is asked for now, while the person is here to answer.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
+            MainActor.assumeIsolated { self?.checkReadiness() }
+        }
+    }
+
+    /// The camera to see the face, Accessibility to type the password, and SAVISUL opening at login so it is running
+    /// after a restart. A missing one is asked for with a notice; after a restart the first sign-in is the password's.
+    private func checkReadiness() {
+        guard running else { return }
+        FaceAccess.keepOpenAtLogin()
+        if !FaceCamera.allowed {
+            FaceLog.write("camera not allowed")
+            Suite.shared.notify(IslandNotice(symbol: "camera", tint: Palette.warning, title: FacePhrases.needsCamera.text,
+                                             detail: FacePhrases.cameraHow.text, style: .warning, duration: 12,
+                                             actionTitle: FacePhrases.allow.text, action: { FaceAccess.askForCamera() }))
+        } else if !AXIsProcessTrusted() {
+            FaceLog.write("accessibility not allowed")
+            Suite.shared.notify(IslandNotice(symbol: "faceid", tint: Palette.warning, title: FacePhrases.needsTyping.text,
+                                             detail: FacePhrases.typingHow.text, style: .warning, duration: 12,
+                                             actionTitle: FacePhrases.allow.text, action: { FaceAccess.askToType() }))
+        } else if ProcessInfo.processInfo.systemUptime < 20 * 60 {
+            let boot = Date().timeIntervalSince1970 - ProcessInfo.processInfo.systemUptime
+            guard abs(UserDefaults.standard.double(forKey: "faceUnlockToldBoot") - boot) > 120 else { return }
+            UserDefaults.standard.set(boot, forKey: "faceUnlockToldBoot")
+            Suite.shared.notify(IslandNotice(symbol: "faceid", tint: Palette.accent, title: FacePhrases.title.text,
+                                             detail: FacePhrases.afterRestart.text, style: .warning, duration: 8,
+                                             actionTitle: nil, action: nil))
         }
     }
 
@@ -213,6 +254,8 @@ final class FaceUnlock {
     // MARK: The lock screen
 
     private func locked() {
+        // macOS can say it twice; the second time would cancel a scan or a password already on its way in.
+        if let lockedAt = policy.lockedAt, Date().timeIntervalSince(lockedAt) < 5 { return }
         FaceLog.write("locked")
         policy.lockedAt = Date()
         policy.failures = 0
@@ -244,7 +287,9 @@ final class FaceUnlock {
 
     /// A key, a click or a touch after the last scan starts the next one.
     private func check() {
-        guard !busy else { return }
+        // With the display off nothing can start a scan but waking it, which has its own notice; no need to ask the
+        // input system seven times a second all night.
+        guard !busy, !policy.displayAsleep else { return }
         let now = Date()
         let touched = now.addingTimeInterval(-LockScreen.secondsSinceInput)
         guard touched > scanEnded else { return }
@@ -267,8 +312,11 @@ final class FaceUnlock {
     }
 
     private func unlocked() {
-        let byFace = typedAt.map { Date().timeIntervalSince($0) < 8 } ?? false
+        // Once per lock. macOS can say it twice, and the second time, with nothing typed, read as a password unlock and
+        // pushed back the day the password is asked for again.
+        guard policy.lockedAt != nil else { return }
         let typingFailed = typedFailed
+        let byFace = UnlockPolicy.openedByFace(typedAt: typedAt, typingFailed: typingFailed, now: Date())
         poll?.invalidate()
         poll = nil
         if scanning { endScan(accepted: false) }
@@ -432,7 +480,7 @@ final class FaceUnlock {
             return
         }
         FaceLog.write("typed the password (secure input: \(owner))")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 4) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + UnlockPolicy.typingSettles) { [weak self] in
             MainActor.assumeIsolated {
                 guard let self, self.policy.lockedAt != nil, self.typedAt == typed else { return }
                 // Still locked after the password went in: no more typing until a person unlocks.
@@ -474,6 +522,15 @@ struct UnlockPolicy {
     static let lockGesture: TimeInterval = 0.5
     static let passwordEvery: TimeInterval = 156 * 3600
     static let strangersBeforePassword = 5
+    /// How long the lock screen may take to open after the password goes in; the first time after sleep it took five seconds.
+    static let typingSettles: TimeInterval = 8
+
+    /// Whether the Mac was opened by the password SAVISUL typed: it went in moments ago and wasn't found to have failed.
+    /// Anything else was the person, with the password or Touch ID.
+    static func openedByFace(typedAt: Date?, typingFailed: Bool, now: Date) -> Bool {
+        guard let typedAt, !typingFailed else { return false }
+        return now.timeIntervalSince(typedAt) < typingSettles + 2
+    }
 
     var lockedAt: Date?
     var lastPasswordUnlock: Date?
@@ -513,7 +570,56 @@ enum FaceLog {
     }
 }
 
+/// What Face Unlock asks macOS for.
+@MainActor
+enum FaceAccess {
+    /// Typing the password at the lock screen needs Accessibility. After an update an unsigned build no longer matches
+    /// its old entry, which still looks switched on, so that stale entry is cleared before asking again.
+    static func askToType() {
+        guard !AXIsProcessTrusted() else { return }
+        if let id = Bundle.main.bundleIdentifier {
+            let reset = Process()
+            reset.executableURL = URL(fileURLWithPath: "/usr/bin/tccutil")
+            reset.arguments = ["reset", "Accessibility", id]
+            reset.standardOutput = FileHandle.nullDevice
+            reset.standardError = FileHandle.nullDevice
+            if (try? reset.run()) != nil { reset.waitUntilExit() }
+        }
+        let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
+        _ = AXIsProcessTrustedWithOptions(options)
+    }
+
+    static func askForCamera() {
+        if AVCaptureDevice.authorizationStatus(for: .video) == .notDetermined {
+            AVCaptureDevice.requestAccess(for: .video) { _ in }
+        } else if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Camera") {
+            NSWorkspace.shared.open(url)
+        }
+    }
+
+    /// Face Unlock only works while SAVISUL runs, so with it on SAVISUL opens at login.
+    static func keepOpenAtLogin() {
+        if SMAppService.mainApp.status != .enabled { try? SMAppService.mainApp.register() }
+    }
+}
+
 enum FacePhrases {
+    static let needsTyping = Phrase("Face Unlock needs Accessibility to type your password", ru: "Входу по лицу нужен Универсальный доступ, чтобы вводить пароль",
+                                    uk: "Входу за обличчям потрібен Універсальний доступ, щоб вводити пароль", fr: "Le déverrouillage facial a besoin de l’Accessibilité pour taper votre mot de passe")
+    static let typingHow = Phrase("Allow SAVISUL in System Settings → Privacy & Security → Accessibility.",
+                                  ru: "Разрешите SAVISUL в Системных настройках → Конфиденциальность и безопасность → Универсальный доступ.",
+                                  uk: "Дозвольте SAVISUL у Системних параметрах → Конфіденційність і безпека → Універсальний доступ.",
+                                  fr: "Autorisez SAVISUL dans Réglages Système → Confidentialité et sécurité → Accessibilité.")
+    static let needsCamera = Phrase("Face Unlock needs the camera", ru: "Входу по лицу нужна камера", uk: "Входу за обличчям потрібна камера",
+                                    fr: "Le déverrouillage facial a besoin de la caméra")
+    static let cameraHow = Phrase("Allow SAVISUL in System Settings → Privacy & Security → Camera.",
+                                  ru: "Разрешите SAVISUL в Системных настройках → Конфиденциальность и безопасность → Камера.",
+                                  uk: "Дозвольте SAVISUL у Системних параметрах → Конфіденційність і безпека → Камера.",
+                                  fr: "Autorisez SAVISUL dans Réglages Système → Confidentialité et sécurité → Caméra.")
+    static let afterRestart = Phrase("After a restart macOS asks for your password once. From the next lock, your face opens the Mac.",
+                                     ru: "После перезагрузки macOS один раз просит пароль. Со следующей блокировки Mac откроется по лицу.",
+                                     uk: "Після перезавантаження macOS один раз просить пароль. З наступного блокування Mac відкриється за обличчям.",
+                                     fr: "Après un redémarrage, macOS demande une fois le mot de passe. Dès le prochain verrouillage, votre visage ouvre le Mac.")
     static let title = Phrase("Face Unlock", ru: "Вход по лицу", uk: "Вхід за обличчям", fr: "Déverrouillage facial")
     static let unlocked = Phrase("Unlocked with your face", ru: "Открыто по лицу", uk: "Відкрито за обличчям", fr: "Déverrouillé par votre visage")
     static let needsScan = Phrase("Face Unlock needs a new scan after the macOS update", ru: "После обновления macOS нужно заново отсканировать лицо",

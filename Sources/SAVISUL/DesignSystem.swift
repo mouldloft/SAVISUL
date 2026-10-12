@@ -17,6 +17,8 @@ enum Palette {
 enum Metrics {
     static let panelWidth: CGFloat = 400
     static let panelHeight: CGFloat = 656
+    static let panelMinHeight: CGFloat = 520
+    static let panelMaxSize = CGSize(width: 640, height: 1120)
     static let panelRadius: CGFloat = 26
     static let cardRadius: CGFloat = 20
     static let gutter: CGFloat = 14
@@ -32,6 +34,7 @@ extension Animation {
 struct CardSurface: ViewModifier {
     var radius: CGFloat
     var padding: CGFloat
+    @Environment(\.wallpaperBehind) private var wallpaperBehind
 
     func body(content: Content) -> some View {
         content
@@ -40,6 +43,10 @@ struct CardSurface: ViewModifier {
             .background {
                 let shape = RoundedRectangle(cornerRadius: radius, style: .continuous)
                 ZStack {
+                    if wallpaperBehind {
+                        // Over the live wallpaper a card darkens a little, so the scene stays in view and text reads.
+                        shape.fill(Color.black.opacity(0.22))
+                    }
                     shape.fill(Color.white.opacity(0.055))
                     shape.fill(LinearGradient(
                         colors: [Color.white.opacity(0.06), Color.white.opacity(0)],

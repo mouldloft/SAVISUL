@@ -73,13 +73,13 @@ final class IslandController {
         }
     }
 
-    var screen: NSScreen {
-        ScreenSpace.notchScreen ?? NSScreen.main ?? NSScreen.screens[0]
+    /// Nil for a moment while displays are swapped, when macOS has no screen at all.
+    var screen: NSScreen? {
+        ScreenSpace.notchScreen ?? NSScreen.main ?? NSScreen.screens.first
     }
 
     private func place() {
-        guard let panel else { return }
-        let screen = screen
+        guard let panel, let screen else { return }
         let frame = screen.frame
         if let left = screen.auxiliaryTopLeftArea, let right = screen.auxiliaryTopRightArea, screen.safeAreaInsets.top > 0 {
             model.notch = CGSize(width: max(right.minX - left.maxX, 120), height: screen.safeAreaInsets.top)
@@ -125,7 +125,7 @@ final class IslandController {
     /// The black shape in screen coordinates, with a little slack so the edge is easy to hit.
     private func shapeRect(slack: CGFloat) -> NSRect {
         let size = IslandLayout.size(for: model, activity: IslandActivity.current(suite))
-        let screen = screen
+        guard let screen else { return .zero }
         let center = notchCenterX(screen)
         var rect = NSRect(x: center - size.width / 2, y: screen.frame.maxY - size.height, width: size.width, height: size.height)
         if model.mode == .collapsed && !model.hasNotch {
@@ -140,7 +140,7 @@ final class IslandController {
         let activity = IslandActivity.current(suite)
         guard IslandActivity.companion(suite, beside: activity) != nil else { return nil }
         let size = IslandLayout.size(for: model, activity: activity)
-        let screen = screen
+        guard let screen else { return nil }
         let x = notchCenterX(screen) + size.width / 2 + IslandRoot.bubbleGap
         let rect = NSRect(x: x, y: screen.frame.maxY - model.notch.height, width: CompanionBubble.width(model.notch.height), height: model.notch.height)
         return rect.insetBy(dx: -slack, dy: -slack)
@@ -198,7 +198,7 @@ final class IslandController {
     /// A drag with content that comes near the notch opens the shelf as a drop target.
     private func trackDrag(_ mouse: NSPoint) {
         guard suite.settings.islandShelf, NSPasteboard(name: .drag).changeCount != dragBoard else { return }
-        let screen = screen
+        guard let screen else { return }
         let center = notchCenterX(screen)
         let zone = NSRect(x: center - 260, y: screen.frame.maxY - 90, width: 520, height: 90)
         let near = zone.contains(mouse)

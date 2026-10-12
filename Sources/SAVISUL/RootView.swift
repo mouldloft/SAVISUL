@@ -5,11 +5,19 @@ struct RootView: View {
     var backdrop = false
 
     var body: some View {
+        let live = LiveWallpaper.shared
+        let wallpaper = !backdrop && live.target.inApp
         ZStack {
             if backdrop { PreviewWallpaper() }
-            PanelBackdrop()
+            if wallpaper {
+                LiveWallpaperBackground(landscape: live.landscape, glow: live.glow)
+                    .allowsHitTesting(false)
+            }
+            PanelBackdrop(wallpaper: wallpaper)
             VStack(spacing: 0) {
                 PanelHeader(model: model)
+                    .contentShape(Rectangle())
+                    .gesture(DragGesture(minimumDistance: 3).onChanged { _ in model.dragPanel?() })
                     .padding(.horizontal, 18)
                     .padding(.top, 16)
                     .padding(.bottom, 12)
@@ -40,9 +48,11 @@ struct RootView: View {
                     .transition(.scale(scale: 0.9, anchor: .topTrailing).combined(with: .opacity))
             }
         }
-        .frame(width: Metrics.panelWidth, height: Metrics.panelHeight)
+        .frame(minWidth: Metrics.panelWidth, maxWidth: .infinity, minHeight: Metrics.panelMinHeight, maxHeight: .infinity)
+        .overlay { if !backdrop { PanelResizeEdges(model: model) } }
         .clipShape(RoundedRectangle(cornerRadius: Metrics.panelRadius, style: .circular))
         .environment(\.colorScheme, .dark)
+        .environment(\.wallpaperBehind, wallpaper)
         .animation(.panelSpring, value: model.menuOpen)
         .animation(.panelSpring, value: model.toast)
     }
@@ -90,11 +100,52 @@ private struct PaneScroll: View {
     }
 }
 
+/// Invisible grips on the panel's right and bottom edges, with the resize pointer, like a window's edges.
+private struct PanelResizeEdges: View {
+    var model: AppModel
+    @State private var start: CGSize?
+
+    var body: some View {
+        GeometryReader { geo in
+            ZStack {
+                grip([.horizontal], cursor: .resizeLeftRight, size: geo.size)
+                    .frame(width: 7)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
+                    .padding(.vertical, 28)
+                grip([.vertical], cursor: .resizeUpDown, size: geo.size)
+                    .frame(height: 7)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                    .padding(.horizontal, 28)
+                grip([.horizontal, .vertical], cursor: .resizeUpDown, size: geo.size)
+                    .frame(width: 22, height: 22)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+            }
+        }
+    }
+
+    private func grip(_ axes: Axis.Set, cursor: NSCursor, size: CGSize) -> some View {
+        Color.clear
+            .contentShape(Rectangle())
+            .onHover { inside in inside ? cursor.push() : NSCursor.pop() }
+            .gesture(DragGesture(minimumDistance: 1, coordinateSpace: .global)
+                .onChanged { value in
+                    let base = start ?? size
+                    if start == nil { start = size }
+                    model.resizePanel?(CGSize(width: base.width + (axes.contains(.horizontal) ? value.translation.width : 0),
+                                              height: base.height + (axes.contains(.vertical) ? value.translation.height : 0)))
+                }
+                .onEnded { _ in start = nil })
+    }
+}
+
 struct PanelBackdrop: View {
+    /// With the live wallpaper behind it the glass is thinner, so the sakura shows through and text stays legible.
+    var wallpaper = false
+
     var body: some View {
         let shape = RoundedRectangle(cornerRadius: Metrics.panelRadius, style: .circular)
         ZStack {
-            shape.fill(Color(red: 0.05, green: 0.05, blue: 0.06).opacity(0.6))
+            shape.fill(Color(red: 0.05, green: 0.05, blue: 0.06).opacity(wallpaper ? 0.4 : 0.6))
             shape.fill(RadialGradient(colors: [Color.white.opacity(0.09), .clear], center: UnitPoint(x: 0.18, y: 0),
                                       startRadius: 0, endRadius: 340))
             shape.strokeBorder(LinearGradient(colors: [Color.white.opacity(0.3), Color.white.opacity(0.06), Color.white.opacity(0.14)],

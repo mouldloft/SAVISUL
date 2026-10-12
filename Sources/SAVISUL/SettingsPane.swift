@@ -8,6 +8,7 @@ struct SettingsPane: View {
         VStack(spacing: 12) {
             LanguageCard(model: model)
             GeneralCard(model: model)
+            WallpaperCard(model: model)
             AICard()
             PermissionsCard(model: model)
             AboutFooter(model: model)
@@ -90,6 +91,44 @@ private struct GeneralCard: View {
 }
 
 /// The person's own AI key for Context Actions. Nothing is sent anywhere without it.
+private struct WallpaperCard: View {
+    var model: AppModel
+
+    var body: some View {
+        let wallpaper = LiveWallpaper.shared
+        VStack(alignment: .leading, spacing: 0) {
+            CardTitle(model.text(.wallpaper))
+                .padding(.bottom, 4)
+            Text(model.text(.wallpaperDetail))
+                .font(.system(size: 11.5))
+                .foregroundStyle(Palette.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.bottom, 12)
+            caption(model.text(.wpScene))
+            GlassSegmented(items: WallpaperLandscape.allCases.map { SegmentItem(value: $0, title: model.text($0.copy)) },
+                           selection: wallpaper.landscape) { wallpaper.setLandscape($0) }
+                .padding(.bottom, 12)
+            caption(model.text(.wpWhere))
+            GlassSegmented(items: WallpaperTarget.allCases.map { SegmentItem(value: $0, title: model.text($0.copy)) },
+                           selection: wallpaper.target) { wallpaper.setTarget($0) }
+                .padding(.bottom, 8)
+            Hairline(inset: 42)
+            ToggleRow(symbol: "cursorarrow.rays", tint: Palette.accent, title: model.text(.wallpaperGlow),
+                      detail: model.text(.wallpaperGlowDetail), isOn: wallpaper.glow) {
+                wallpaper.setGlow(!wallpaper.glow)
+            }
+        }
+        .card()
+    }
+
+    private func caption(_ text: String) -> some View {
+        Text(text)
+            .font(.system(size: 11, weight: .semibold))
+            .foregroundStyle(Palette.tertiary)
+            .padding(.bottom, 6)
+    }
+}
+
 private struct AICard: View {
     @State private var key = ""
     @State private var testing = false
