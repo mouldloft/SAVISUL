@@ -3,6 +3,11 @@
 # Double-click runs it from the disk image. Pasting it into Terminal also works:
 # Gatekeeper does not apply to a command a person typed themselves.
 set -euo pipefail
+# A dark window for the install, whatever Terminal's own default is.
+if [[ "${TERM_PROGRAM:-}" == "Apple_Terminal" ]]; then
+  osascript -e 'tell application "Terminal" to set current settings of front window to settings set "Pro"' >/dev/null 2>&1 || true
+fi
+print -P "\n  %B%F{223}SAVISUL%f%b  %F{180}установка%f\n"
 
 install_app() {
   local src="$1"
@@ -27,6 +32,12 @@ install_app() {
     /usr/bin/pkill -x SAVISUL >/dev/null 2>&1 || true
   fi
   /usr/bin/xattr -cr "$src" 2>/dev/null || true
+  # Builds before 2.3 were signed ad hoc, so macOS's grants for them no longer fit; clear them so SAVISUL is asked afresh.
+  if [[ -d "$dest" ]] && /usr/bin/codesign -dr - "$dest" 2>&1 | grep -q cdhash; then
+    for service in Accessibility ScreenCapture ListenEvent PostEvent AppleEvents; do
+      /usr/bin/tccutil reset "$service" com.savisul.menu >/dev/null 2>&1 || true
+    done
+  fi
   if [[ "$src" != "$dest" ]]; then
     rm -rf "$dest"
     /usr/bin/ditto "$src" "$dest"
@@ -34,7 +45,7 @@ install_app() {
   /usr/bin/xattr -cr "$dest"
   chmod +x "$dest/Contents/MacOS/SAVISUL"
   open "$dest"
-  print -r -- "Открыто: $dest"
+  print -P "  %F{150}✓%f SAVISUL установлен и открыт: $dest\n  Дальше он обновляется сам: Настройки → Обновления.\n"
 }
 
 app_from() {

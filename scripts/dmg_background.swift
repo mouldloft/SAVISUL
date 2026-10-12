@@ -1,4 +1,5 @@
 import AppKit
+import CoreImage
 
 // The installer window's background, drawn at twice its size so it is sharp on Retina screens. The window is
 // 720 × 440 points; Finder puts the three icons on one row, centred at x 180, 360 and 540, 206 points from the top.
@@ -19,6 +20,18 @@ NSGradient(colors: [NSColor(srgbRed: 0.088, green: 0.07, blue: 0.056, alpha: 1),
     .draw(in: canvas, angle: -90)
 NSGradient(colors: [champagne.withAlphaComponent(0.13), champagne.withAlphaComponent(0)])!
     .draw(fromCenter: NSPoint(x: 360, y: height - 206), radius: 0, toCenter: NSPoint(x: 360, y: height - 206), radius: 300, options: [])
+
+// The studio bonsai from the live wallpaper, blurred into a soft glow so the row stays legible over it.
+if let photo = CIImage(contentsOf: URL(fileURLWithPath: "Resources/Wallpapers/sakura-bonsai-wide.heic")),
+   let cg = CIContext().createCGImage(photo.clampedToExtent().applyingGaussianBlur(sigma: 14).cropped(to: photo.extent), from: photo.extent) {
+    let image = NSImage(cgImage: cg, size: NSSize(width: cg.width, height: cg.height))
+    let scale = max(width / image.size.width, height / image.size.height) * 1.08
+    let drawn = NSSize(width: image.size.width * scale, height: image.size.height * scale)
+    image.draw(in: NSRect(x: (width - drawn.width) / 2, y: (height - drawn.height) / 2 - 20, width: drawn.width, height: drawn.height),
+               from: .zero, operation: .sourceOver, fraction: 0.56)
+    NSGradient(colors: [NSColor.black.withAlphaComponent(0.5), NSColor.black.withAlphaComponent(0.42), NSColor.black.withAlphaComponent(0.72)],
+               atLocations: [0, 0.45, 1], colorSpace: .sRGB)!.draw(in: canvas, angle: -90)
+}
 
 /// A line of text centred on the window, its top `top` points below the window's top edge.
 func line(_ string: String, top: CGFloat, font: NSFont, color: NSColor, kern: CGFloat = 0) {

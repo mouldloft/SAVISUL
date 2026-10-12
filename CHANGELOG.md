@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.3.1
+
+### Better
+
+- Permissions: asking for Accessibility or Screen Recording first clears a grant an older, differently signed SAVISUL left behind, which looked switched on but no longer worked, so macOS shows its real prompt. Installing over a build from before 2.3 clears those old grants too.
+- The installer: the window sits on a soft, blurred sakura, and the install runs in a dark Terminal window with a short, clear summary at the end.
+
+### Download
+
+[SAVISUL-2.3.1.dmg](https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.3.1.dmg) for macOS 14.2 or later on Apple silicon. SAVISUL 2.3 offers this update by itself.
+
 ## 2.3
 
 ### New
@@ -13,7 +24,7 @@
 
 ### Download
 
-[SAVISUL-2.3.dmg](https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.3.dmg) for macOS 14.2 or later on Apple silicon.
+[SAVISUL-2.3.dmg](https://github.com/mouldloft/SAVISUL/releases/download/v2.3/SAVISUL-2.3.dmg) for macOS 14.2 or later on Apple silicon.
 
 The build is signed with SAVISUL's own certificate and is not notarized. See the installation notes in the README.
 

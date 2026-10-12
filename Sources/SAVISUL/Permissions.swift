@@ -157,10 +157,23 @@ final class PermissionCenter {
         timer = nil
     }
 
+    /// A grant made to an older, differently signed SAVISUL still looks switched on in System Settings but no longer
+    /// applies, and macOS won't ask again while it is there. Clearing it lets the request below show the real prompt.
+    static func forgetStaleGrant(_ service: String) {
+        guard let id = Bundle.main.bundleIdentifier else { return }
+        let reset = Process()
+        reset.executableURL = URL(fileURLWithPath: "/usr/bin/tccutil")
+        reset.arguments = ["reset", service, id]
+        reset.standardOutput = FileHandle.nullDevice
+        reset.standardError = FileHandle.nullDevice
+        if (try? reset.run()) != nil { reset.waitUntilExit() }
+    }
+
     func requestAccessibility() {
         accessibilityAskedAt = Date()
         scheduleTimer()
-        if accessibility == .notDetermined {
+        if !AXIsProcessTrusted() {
+            Self.forgetStaleGrant("Accessibility")
             defaults.set(true, forKey: "axRequested")
             let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
             _ = AXIsProcessTrustedWithOptions(options)
@@ -171,7 +184,8 @@ final class PermissionCenter {
     }
 
     func requestScreenRecording() {
-        if screen == .notDetermined {
+        if !CGPreflightScreenCaptureAccess() {
+            Self.forgetStaleGrant("ScreenCapture")
             defaults.set(true, forKey: "screenRequested")
             _ = CGRequestScreenCaptureAccess()
         } else {

@@ -18,7 +18,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.3.dmg"><img src="https://img.shields.io/badge/Download-SAVISUL%202.3-DBC7A3?style=for-the-badge&logo=apple&logoColor=DBC7A3&labelColor=17130E" alt="Download SAVISUL 2.3" height="36"></a>
+  <a href="https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.3.1.dmg"><img src="https://img.shields.io/badge/Download-SAVISUL%202.3.1-DBC7A3?style=for-the-badge&logo=apple&logoColor=DBC7A3&labelColor=17130E" alt="Download SAVISUL 2.3.1" height="36"></a>
 </p>
 
 <p align="center">
@@ -130,6 +130,10 @@ It talks to the Mac app, so a page, an image or a selection goes straight into a
 </p>
 
 ## Live wallpaper
+
+<p align="center">
+  <img src="docs/readme/wallpaper.gif" alt="SAVISUL's live wallpaper: a sakura bonsai, a cherry tree on a hill under snowy mountains, and a bonsai on a hilltop, with petals falling" width="880">
+</p>
 
 Sakura that never loops, drawn live behind SAVISUL's panel, on the desktop, or both. Three scenes: a bonsai, a cherry tree on a grassy hill under snowy mountains, and a bonsai on a hilltop, each with a painting made for the panel and one for the desktop. Petals fall from the tree on a breeze that never repeats, the crown sways and the grass moves. With **The pointer brings it to life** on, the wallpaper glows under the pointer, petals drift away from it and the grass rustles where it passes. Settings → Live wallpaper.
 
