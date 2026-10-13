@@ -14,7 +14,7 @@
 		X-Frame-Options SAMEORIGIN
 		-Server
 	}
-	header /assets/* Cache-Control "public, max-age=604800"
+	header /assets/* Cache-Control "public, max-age=300, must-revalidate"
 	header /download/* {
 		Cache-Control "public, max-age=3600"
 		Content-Disposition attachment

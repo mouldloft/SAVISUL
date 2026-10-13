@@ -1,12 +1,12 @@
 // The SAVISUL panel (⌃⌥S), rebuilt from the app's SwiftUI source: same tabs, cards, controls, copy and sizes.
 // Copy comes from the app's own string table (app-strings.js); the data is the app's preview sample.
-import { h, clear } from './dom.js';
-import { mark } from './icons.js';
-import { sym, appTile } from './panel-icons.js';
-import { APP_STRINGS } from './app-strings.js';
-import { lang as siteLang, setLang, onLang } from './i18n.js';
-import { CONFIG } from './config.js';
-import { FEATURE_GROUPS, FEATURE_DEFAULTS, FEATURE_PHRASES, FEATURE_STRINGS } from './features-data.js';
+import { h, clear } from './dom.js?v=24';
+import { mark } from './icons.js?v=24';
+import { sym, appTile } from './panel-icons.js?v=24';
+import { APP_STRINGS } from './app-strings.js?v=24';
+import { lang as siteLang, setLang, onLang } from './i18n.js?v=24';
+import { CONFIG } from './config.js?v=24';
+import { FEATURE_GROUPS, FEATURE_DEFAULTS, FEATURE_PHRASES, FEATURE_STRINGS } from './features-data.js?v=24';
 
 // The Features tab's two table strings ride with its generated data.
 for (const [key, byLang] of Object.entries(FEATURE_STRINGS)) {

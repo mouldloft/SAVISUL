@@ -10,7 +10,7 @@ struct RootView: View {
         ZStack {
             if backdrop { PreviewWallpaper() }
             if wallpaper {
-                LiveWallpaperBackground(landscape: live.landscape, glow: live.glow)
+                LiveWallpaperBackground(landscape: live.landscape, customPath: live.customPath, glow: live.glow)
                     .allowsHitTesting(false)
             }
             PanelBackdrop(wallpaper: wallpaper)

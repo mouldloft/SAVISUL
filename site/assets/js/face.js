@@ -1,8 +1,8 @@
 // Face Unlock, acted out: the lock screen, the padlock under the notch, the scanning ring and the way in.
 // One timeline drives every part, so the field guide plate, the desktop demo and the README GIF show the same seconds.
-import { h } from './dom.js';
-import { icon } from './icons.js';
-import { t } from './i18n.js';
+import { h } from './dom.js?v=24';
+import { icon } from './icons.js?v=24';
+import { t } from './i18n.js?v=24';
 
 /** Seconds in one run, from the locked screen back to it. */
 export const FACE_LOOP = 6.4;

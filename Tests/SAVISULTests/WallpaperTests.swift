@@ -12,7 +12,7 @@ struct WallpaperTests {
     }
 
     @Test func everyLanguageNamesTheWallpaperSettings() {
-        let keys: [Copy] = [.wallpaper, .wallpaperDetail, .wallpaperGlow, .wallpaperGlowDetail, .wpScene, .wpWhere]
+        let keys: [Copy] = [.wallpaper, .wallpaperDetail, .wallpaperGlow, .wallpaperGlowDetail, .wpScene, .wpWhere, .wpAdd]
             + WallpaperTarget.allCases.map(\.copy) + WallpaperLandscape.allCases.map(\.copy)
         for language in Language.allCases {
             for key in keys { #expect(L10n.text(key, language) != key.rawValue, "\(language) \(key)") }
@@ -24,7 +24,7 @@ struct WallpaperTests {
         let bonsai = WallpaperLandscape.bonsai.art(for: .desktop)
         #expect(abs(bonsai.groundY(atX: 0.5) - 0.86) < 0.001)
         #expect(abs(bonsai.groundY(atX: 0.1) - 0.97) < 0.001)
-        for landscape in WallpaperLandscape.allCases {
+        for landscape in WallpaperLandscape.allCases where landscape != .custom {
             for placement in [SakuraScene.Placement.panel, .desktop] {
                 let art = landscape.art(for: placement)
                 #expect(art.resource.hasPrefix("sakura"))

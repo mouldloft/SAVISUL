@@ -60,7 +60,7 @@ enum Copy: String {
     case browserReveal, browserOpen
 
     case settingsSubtitle, language, general, openAtLogin, showInDock, keepOpen, keepOpenDetail
-    case wallpaper, wallpaperDetail, wallpaperGlow, wallpaperGlowDetail, wpOff, wpApp, wpDesktop, wpBoth, wpScene, wpWhere, wpBonsai, wpHill, wpBonsaiHill
+    case wallpaper, wallpaperDetail, wallpaperGlow, wallpaperGlowDetail, wpOff, wpApp, wpDesktop, wpBoth, wpScene, wpWhere, wpBonsai, wpHill, wpBonsaiHill, wpCustom, wpAdd
     case shortcut, shortcutDetail, shortcutBusy, permissions, permissionsNote
     case permAccessibility, permAccessibilityUse, permScreen, permScreenUse
     case permNotifications, permNotificationsUse, permLogin, permLoginUse, permAdmin, permAdminUse
@@ -98,7 +98,7 @@ enum L10n {
     private static let tables: [Language: [Copy: String]] = [.en: english, .ru: russian, .uk: ukrainian, .fr: french]
 
     private static let english: [Copy: String] = [
-        .wallpaper: "Live wallpaper", .wallpaperDetail: "A sakura bonsai drawn live: petals fall from the tree and never loop.", .wallpaperGlow: "The pointer brings it to life", .wallpaperGlowDetail: "Where the pointer is, the wallpaper glows, petals drift away and the grass rustles. Works on SAVISUL wallpapers only.", .wpOff: "Off", .wpApp: "SAVISUL", .wpDesktop: "Desktop", .wpBoth: "Both", .wpScene: "Scene", .wpWhere: "Show on", .wpBonsai: "Bonsai", .wpHill: "Hill", .wpBonsaiHill: "Bonsai on a hill",
+        .wallpaper: "Live wallpaper", .wallpaperDetail: "A sakura bonsai drawn live: petals fall from the tree and never loop.", .wallpaperGlow: "The pointer brings it to life", .wallpaperGlowDetail: "Where the pointer is, the wallpaper glows, petals drift away and the grass rustles. Works on SAVISUL wallpapers only.", .wpOff: "Off", .wpApp: "SAVISUL", .wpDesktop: "Desktop", .wpBoth: "Both", .wpScene: "Scene", .wpWhere: "Show on", .wpBonsai: "Bonsai", .wpHill: "Hill", .wpBonsaiHill: "Bonsai on a hill", .wpCustom: "Your picture", .wpAdd: "Add your own",
         .tabEnergy: "Energy", .tabSound: "Sound", .tabSystem: "System", .tabWork: "Work", .tabTools: "Tools",
         .tabFeatures: "Features", .featuresSubtitle: "%@ of %@ turned on",
         .tabSettings: "Settings", .moreMenu: "More", .tabAutomations: "Automations",
@@ -219,7 +219,7 @@ enum L10n {
     ]
 
     private static let russian: [Copy: String] = [
-        .wallpaper: "Живые обои", .wallpaperDetail: "Бонсай-сакура, нарисованная вживую: лепестки падают с дерева без повторов и склеек.", .wallpaperGlow: "Курсор оживляет обои", .wallpaperGlowDetail: "Под курсором обои светятся, лепестки облетают его, а трава шелестит. Работает только на обоях SAVISUL.", .wpOff: "Выкл.", .wpApp: "В SAVISUL", .wpDesktop: "На столе", .wpBoth: "Везде", .wpScene: "Сцена", .wpWhere: "Где показывать", .wpBonsai: "Бонсай", .wpHill: "Холм", .wpBonsaiHill: "Бонсай на холме",
+        .wallpaper: "Живые обои", .wallpaperDetail: "Бонсай-сакура, нарисованная вживую: лепестки падают с дерева без повторов и склеек.", .wallpaperGlow: "Курсор оживляет обои", .wallpaperGlowDetail: "Под курсором обои светятся, лепестки облетают его, а трава шелестит. Работает только на обоях SAVISUL.", .wpOff: "Выкл.", .wpApp: "В SAVISUL", .wpDesktop: "На столе", .wpBoth: "Везде", .wpScene: "Сцена", .wpWhere: "Где показывать", .wpBonsai: "Бонсай", .wpHill: "Холм", .wpBonsaiHill: "Бонсай на холме", .wpCustom: "Свой фон", .wpAdd: "Загрузить свой",
         .tabEnergy: "Питание", .tabSound: "Звук", .tabSystem: "Система", .tabWork: "Работа", .tabTools: "Утилиты",
         .tabFeatures: "Возможности", .featuresSubtitle: "Включено %@ из %@",
         .tabSettings: "Настройки", .moreMenu: "Ещё", .tabAutomations: "Автоматизации",
@@ -341,7 +341,7 @@ enum L10n {
     ]
 
     private static let ukrainian: [Copy: String] = [
-        .wallpaper: "Живі шпалери", .wallpaperDetail: "Бонсай-сакура, намальована наживо: пелюстки падають з дерева без повторів і склейок.", .wallpaperGlow: "Курсор оживляє шпалери", .wallpaperGlowDetail: "Під курсором шпалери світяться, пелюстки оминають його, а трава шелестить. Працює лише на шпалерах SAVISUL.", .wpOff: "Вимк.", .wpApp: "У SAVISUL", .wpDesktop: "На столі", .wpBoth: "Скрізь", .wpScene: "Сцена", .wpWhere: "Де показувати", .wpBonsai: "Бонсай", .wpHill: "Пагорб", .wpBonsaiHill: "Бонсай на пагорбі",
+        .wallpaper: "Живі шпалери", .wallpaperDetail: "Бонсай-сакура, намальована наживо: пелюстки падають з дерева без повторів і склейок.", .wallpaperGlow: "Курсор оживляє шпалери", .wallpaperGlowDetail: "Під курсором шпалери світяться, пелюстки оминають його, а трава шелестить. Працює лише на шпалерах SAVISUL.", .wpOff: "Вимк.", .wpApp: "У SAVISUL", .wpDesktop: "На столі", .wpBoth: "Скрізь", .wpScene: "Сцена", .wpWhere: "Де показувати", .wpBonsai: "Бонсай", .wpHill: "Пагорб", .wpBonsaiHill: "Бонсай на пагорбі", .wpCustom: "Свій фон", .wpAdd: "Завантажити свій",
         .tabEnergy: "Живлення", .tabSound: "Звук", .tabSystem: "Система", .tabWork: "Робота", .tabTools: "Утиліти",
         .tabFeatures: "Можливості", .featuresSubtitle: "Увімкнено %@ з %@",
         .tabSettings: "Параметри", .moreMenu: "Ще", .tabAutomations: "Автоматизації",
@@ -464,7 +464,7 @@ enum L10n {
     ]
 
     private static let french: [Copy: String] = [
-        .wallpaper: "Fond animé", .wallpaperDetail: "Un bonsaï de sakura dessiné en direct : les pétales tombent de l'arbre sans jamais boucler.", .wallpaperGlow: "Le pointeur anime le fond", .wallpaperGlowDetail: "Sous le pointeur, le fond s'éclaire, les pétales s'écartent et l'herbe frémit. Uniquement sur les fonds SAVISUL.", .wpOff: "Non", .wpApp: "SAVISUL", .wpDesktop: "Bureau", .wpBoth: "Partout", .wpScene: "Scène", .wpWhere: "Afficher sur", .wpBonsai: "Bonsaï", .wpHill: "Colline", .wpBonsaiHill: "Bonsaï sur la colline",
+        .wallpaper: "Fond animé", .wallpaperDetail: "Un bonsaï de sakura dessiné en direct : les pétales tombent de l'arbre sans jamais boucler.", .wallpaperGlow: "Le pointeur anime le fond", .wallpaperGlowDetail: "Sous le pointeur, le fond s'éclaire, les pétales s'écartent et l'herbe frémit. Uniquement sur les fonds SAVISUL.", .wpOff: "Non", .wpApp: "SAVISUL", .wpDesktop: "Bureau", .wpBoth: "Partout", .wpScene: "Scène", .wpWhere: "Afficher sur", .wpBonsai: "Bonsaï", .wpHill: "Colline", .wpBonsaiHill: "Bonsaï sur la colline", .wpCustom: "Votre image", .wpAdd: "Ajouter la vôtre",
         .tabEnergy: "Énergie", .tabSound: "Son", .tabSystem: "Système", .tabWork: "Travail", .tabTools: "Outils",
         .tabFeatures: "Fonctions", .featuresSubtitle: "%@ sur %@ activées",
         .tabSettings: "Réglages", .moreMenu: "Plus", .tabAutomations: "Automatisations",

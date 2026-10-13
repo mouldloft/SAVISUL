@@ -1,9 +1,9 @@
 // The island: a replica of SAVISUL's notch island with the app's states (collapsed, peek, expanded)
 // and its four tabs. Sample data only; nothing leaves the page.
-import { h, clear, reducedMotion, coarsePointer } from './dom.js';
-import { icon } from './icons.js';
-import { t, onLang } from './i18n.js';
-import { CONFIG } from './config.js';
+import { h, clear, reducedMotion, coarsePointer } from './dom.js?v=24';
+import { icon } from './icons.js?v=24';
+import { t, onLang } from './i18n.js?v=24';
+import { CONFIG } from './config.js?v=24';
 
 const SVGNS = 'http://www.w3.org/2000/svg';
 

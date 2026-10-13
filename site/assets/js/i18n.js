@@ -408,7 +408,11 @@ const STRINGS = {
     chromeAction: 'Open the browser',
 
     wallTitle: 'Sakura that never loops.',
-    wallBody: 'A live wallpaper behind SAVISUL\u2019s panel, on the desktop, or both. Petals fall on a breeze that never repeats, the crown sways, and the grass rustles where the pointer passes. Three scenes, each painted for the panel and for the desktop.',
+    wallBody: 'A live wallpaper behind SAVISUL\u2019s panel, on the desktop, or both. Petals fall on a breeze that never repeats, the crown sways, and the grass rustles where the pointer passes. Pick a scene from the gallery in Settings, or a picture of your own. Try it right here.',
+    wallHill: 'Hill',
+    wallBonsai: 'Bonsai',
+    wallBonsaiHill: 'Bonsai on a hill',
+    wallHint: 'Move the pointer over the picture',
     panelTitle: 'Your Mac, in one panel.',
     panelBody: '⌃⌥S opens a panel for the machine itself, in English, Russian, Ukrainian or French.',
     panelRows: [
@@ -880,7 +884,11 @@ const STRINGS = {
     chromeAction: 'Открыть браузер',
 
     wallTitle: 'Сакура, которая не повторяется.',
-    wallBody: 'Живые обои за панелью SAVISUL, на рабочем столе или там и там. Лепестки падают на ветру, который никогда не повторяется, крона качается, а трава шелестит там, где прошёл курсор. Три сцены, каждая нарисована и для панели, и для стола.',
+    wallBody: 'Живые обои за панелью SAVISUL, на рабочем столе или там и там. Лепестки падают на ветру, который никогда не повторяется, крона качается, а трава шелестит там, где прошёл курсор. Выберите сцену в галерее в Настройках или загрузите свою картинку. Попробуйте прямо здесь.',
+    wallHill: 'Холм',
+    wallBonsai: 'Бонсай',
+    wallBonsaiHill: 'Бонсай на холме',
+    wallHint: 'Проведите курсором по картинке',
     panelTitle: 'И сам Mac — в одной панели.',
     panelBody: '⌃⌥S открывает панель для самого компьютера: на русском, английском, украинском или французском.',
     panelRows: [

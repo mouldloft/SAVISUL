@@ -1,6 +1,7 @@
 import AppKit
 import SpriteKit
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// Where the live wallpaper plays: behind SAVISUL's own panel, on the Mac's desktop, or both.
 enum WallpaperTarget: String, CaseIterable, Identifiable {
@@ -27,6 +28,7 @@ final class LiveWallpaper {
 
     private(set) var target: WallpaperTarget
     private(set) var landscape: WallpaperLandscape
+    private(set) var customPath: String
     private(set) var glow: Bool
     @ObservationIgnored private let desktop = DesktopWallpaper()
     private var defaults: UserDefaults { SettingsDefaults.store }
@@ -34,7 +36,11 @@ final class LiveWallpaper {
     private init() {
         let defaults = SettingsDefaults.store
         target = WallpaperTarget(rawValue: defaults.string(forKey: "wallpaperTarget") ?? "") ?? .app
-        landscape = WallpaperLandscape(rawValue: defaults.string(forKey: "wallpaperScene") ?? "") ?? .bonsai
+        let custom = defaults.string(forKey: "wallpaperCustom") ?? ""
+        let path = FileManager.default.fileExists(atPath: custom) ? custom : ""
+        customPath = path
+        let scene = WallpaperLandscape(rawValue: defaults.string(forKey: "wallpaperScene") ?? "") ?? .bonsai
+        landscape = scene == .custom && path.isEmpty ? .bonsai : scene
         glow = defaults.object(forKey: "wallpaperGlow") as? Bool ?? true
     }
 
@@ -48,8 +54,28 @@ final class LiveWallpaper {
         sync()
     }
 
+    /// Picks a picture, keeps a copy in SAVISUL's own folder, and makes it the wallpaper.
+    func chooseCustomImage() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.image]
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        NSApp.activate(ignoringOtherApps: true)
+        guard panel.runModal() == .OK, let source = panel.url else { return }
+        let folder = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("SAVISUL/Wallpapers", isDirectory: true)
+        try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        let ext = source.pathExtension.isEmpty ? "jpg" : source.pathExtension
+        let copy = folder.appendingPathComponent("custom-\(UUID().uuidString.prefix(8)).\(ext)")
+        guard (try? FileManager.default.copyItem(at: source, to: copy)) != nil, NSImage(contentsOf: copy) != nil else { return }
+        if !customPath.isEmpty, customPath != copy.path { try? FileManager.default.removeItem(atPath: customPath) }
+        customPath = copy.path
+        defaults.set(customPath, forKey: "wallpaperCustom")
+        setLandscape(.custom)
+    }
+
     private func sync() {
-        desktop.update(visible: target.onDesktop, landscape: landscape, glow: glow)
+        desktop.update(visible: target.onDesktop, landscape: landscape, custom: customPath, glow: glow)
     }
 
     func setTarget(_ target: WallpaperTarget) {
@@ -73,16 +99,19 @@ private final class DesktopWallpaper {
     private var observers: [NSObjectProtocol] = []
     private var glow = true
     private var landscape = WallpaperLandscape.bonsai
+    private var custom = ""
 
-    func update(visible: Bool, landscape: WallpaperLandscape, glow: Bool) {
+    func update(visible: Bool, landscape: WallpaperLandscape, custom: String, glow: Bool) {
         self.glow = glow
         self.landscape = landscape
+        self.custom = custom
         if visible {
             if windows.isEmpty { build() }
             if observers.isEmpty { observe() }
             for window in windows {
                 guard let sakura = (window.contentView as? WallpaperView)?.sakura else { continue }
                 sakura.glowEnabled = glow
+                sakura.customPath = custom
                 sakura.landscape = landscape
             }
         } else {
@@ -103,6 +132,7 @@ private final class DesktopWallpaper {
             window.setFrame(screen.frame, display: false)
             let view = WallpaperView(frame: CGRect(origin: .zero, size: screen.frame.size))
             let scene = SakuraScene(size: screen.frame.size, placement: .desktop, landscape: landscape)
+            scene.customPath = custom
             scene.glowEnabled = glow
             view.presentScene(scene)
             window.contentView = view
@@ -189,6 +219,7 @@ final class WallpaperView: SKView {
 /// The sakura behind SAVISUL's panel.
 struct LiveWallpaperBackground: NSViewRepresentable {
     var landscape: WallpaperLandscape
+    var customPath: String
     var glow: Bool
 
     func makeNSView(context: Context) -> WallpaperView {
@@ -198,6 +229,7 @@ struct LiveWallpaperBackground: NSViewRepresentable {
         view.layer?.cornerRadius = Metrics.panelRadius
         view.layer?.masksToBounds = true
         let scene = SakuraScene(size: CGSize(width: Metrics.panelWidth, height: Metrics.panelHeight), placement: .panel, landscape: landscape)
+        scene.customPath = customPath
         scene.glowEnabled = glow
         view.presentScene(scene)
         return view
@@ -205,6 +237,7 @@ struct LiveWallpaperBackground: NSViewRepresentable {
 
     func updateNSView(_ view: WallpaperView, context: Context) {
         view.sakura?.glowEnabled = glow
+        view.sakura?.customPath = customPath
         view.sakura?.landscape = landscape
     }
 }

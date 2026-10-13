@@ -1,12 +1,12 @@
 // The live desktop: menu bar (also the site's navigation), windows with snapping, the Dock, and the phone layout.
-import { h, clear, clamp, reducedMotion, formatClock } from './dom.js';
-import { icon, mark } from './icons.js';
-import { t, lang, setLang, onLang } from './i18n.js';
-import { CONFIG } from './config.js';
-import { createIsland } from './island.js';
-import { createPanel } from './panel.js';
-import { createBrowser } from './browser.js';
-import { createOverlays } from './overlays.js';
+import { h, clear, clamp, reducedMotion, formatClock } from './dom.js?v=24';
+import { icon, mark } from './icons.js?v=24';
+import { t, lang, setLang, onLang } from './i18n.js?v=24';
+import { CONFIG } from './config.js?v=24';
+import { createIsland } from './island.js?v=24';
+import { createPanel } from './panel.js?v=24';
+import { createBrowser } from './browser.js?v=24';
+import { createOverlays } from './overlays.js?v=24';
 
 const MENU_H = 34;
 const DOCK_RESERVE = 92;

@@ -1,8 +1,8 @@
 // Privacy, license and 404 pages: language switch, icons, contents list for the visible language.
-import { h, clear } from './dom.js';
-import { hydrateIcons } from './icons.js';
-import { lang, apply, setLang, onLang } from './i18n.js';
-import { CONFIG } from './config.js';
+import { h, clear } from './dom.js?v=24';
+import { hydrateIcons } from './icons.js?v=24';
+import { lang, apply, setLang, onLang } from './i18n.js?v=24';
+import { CONFIG } from './config.js?v=24';
 
 function contents() {
   const toc = document.querySelector('[data-toc]');

@@ -1,4 +1,5 @@
 import AppKit
+import ImageIO
 import SpriteKit
 
 /// The sakura wallpaper: a painted scene with petals simulated every frame. Nothing is a video, so nothing ever
@@ -14,13 +15,18 @@ final class SakuraScene: SKScene {
         didSet { if landscape != oldValue && built { reload() } }
     }
 
+    /// The person's own picture, for the custom scene.
+    var customPath = "" {
+        didSet { if customPath != oldValue && landscape == .custom && built { reload() } }
+    }
+
     private let placement: Placement
     private let painting = SKSpriteNode()
     private let halo = SKSpriteNode(texture: SakuraArt.glow)
     private let light = SKSpriteNode(texture: SakuraArt.glow)
     private let layer = SKNode()
     private let grass = SakuraArt.makeGrassShader()
-    private var art: LandscapeArt { landscape.art(for: placement) }
+    private var art: LandscapeArt { landscape.art(for: placement, custom: customPath) }
     private var lastPointer: CGPoint?
     private var grassEnergy: CGFloat = 0
     private var petals: [Petal] = []
@@ -358,12 +364,32 @@ enum SakuraArt {
     }
     """
 
+    /// A bundled painting by name, or the person's own picture by its full path.
+    static func location(_ name: String) -> URL? {
+        guard !name.isEmpty else { return nil }
+        return name.hasPrefix("/") ? URL(fileURLWithPath: name) : Bundle.main.url(forResource: name, withExtension: "heic")
+    }
+
+    @MainActor private static var thumbnails: [String: NSImage] = [:]
+
+    /// A small preview for the gallery in Settings, decoded straight at that size.
+    @MainActor static func thumbnail(_ name: String) -> NSImage? {
+        if let cached = thumbnails[name] { return cached }
+        let options = [kCGImageSourceCreateThumbnailFromImageAlways: true, kCGImageSourceThumbnailMaxPixelSize: 420,
+                       kCGImageSourceCreateThumbnailWithTransform: true] as CFDictionary
+        guard let url = location(name), let source = CGImageSourceCreateWithURL(url as CFURL, nil),
+              let image = CGImageSourceCreateThumbnailAtIndex(source, 0, options) else { return nil }
+        let preview = NSImage(cgImage: image, size: NSSize(width: image.width, height: image.height))
+        thumbnails[name] = preview
+        return preview
+    }
+
     @MainActor private static var loaded: (name: String, texture: SKTexture, size: CGSize)?
 
     /// The painting for a landscape, from the app's resources. Only the one in use stays in memory.
     @MainActor static func painting(_ name: String) -> (texture: SKTexture, size: CGSize)? {
         if let loaded, loaded.name == name { return (loaded.texture, loaded.size) }
-        guard let url = Bundle.main.url(forResource: name, withExtension: "heic"), let image = NSImage(contentsOf: url) else { return nil }
+        guard let url = location(name), let image = NSImage(contentsOf: url) else { return nil }
         let texture = SKTexture(image: image)
         loaded = (name, texture, image.size)
         return (texture, image.size)
@@ -436,7 +462,7 @@ enum SakuraArt {
 /// The paintings the live wallpaper can play. Each scene has a tall painting for SAVISUL's panel and a wide one for
 /// the desktop, so neither is a crop of the other.
 enum WallpaperLandscape: String, CaseIterable, Identifiable {
-    case bonsai, hill, bonsaiHill
+    case bonsai, hill, bonsaiHill, custom
 
     var id: String { rawValue }
 
@@ -445,12 +471,16 @@ enum WallpaperLandscape: String, CaseIterable, Identifiable {
         case .bonsai: .wpBonsai
         case .hill: .wpHill
         case .bonsaiHill: .wpBonsaiHill
+        case .custom: .wpCustom
         }
     }
 
-    func art(for placement: SakuraScene.Placement) -> LandscapeArt {
+    func art(for placement: SakuraScene.Placement, custom: String = "") -> LandscapeArt {
         let tall = placement == .panel
         switch self {
+        case .custom:
+            // A picture of the person's own: petals drift down from above and fall through, nothing else moves.
+            return LandscapeArt(resource: custom, canopy: [], ground: [CGPoint(x: 0, y: 1.05), CGPoint(x: 1, y: 1.05)], landingSpread: 0)
         case .bonsai:
             return tall
                 ? LandscapeArt(resource: "sakura-bonsai-tall", sway: CGRect(x: 0.02, y: 0.3, width: 0.97, height: 0.42), swayAmount: 0.007,

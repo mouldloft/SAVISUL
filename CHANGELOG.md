@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.4
+
+### New
+
+- A wallpaper gallery in Settings: every scene as a preview card, the one playing marked with a check, and a card to add a picture of your own. Your picture plays with petals drifting down over it and the light under the pointer.
+
+### Better
+
+- The site's wallpaper section is live: switch between the three scenes and move the pointer over the picture to light it and scatter the petals, as on the desktop.
+
+### Download
+
+[SAVISUL-2.4.dmg](https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.4.dmg) for macOS 14.2 or later on Apple silicon. SAVISUL 2.3 and later offer this update by themselves.
+
 ## 2.3.1
 
 ### Better
@@ -9,7 +23,7 @@
 
 ### Download
 
-[SAVISUL-2.3.1.dmg](https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.3.1.dmg) for macOS 14.2 or later on Apple silicon. SAVISUL 2.3 offers this update by itself.
+[SAVISUL-2.3.1.dmg](https://github.com/mouldloft/SAVISUL/releases/download/v2.3.1/SAVISUL-2.3.1.dmg) for macOS 14.2 or later on Apple silicon. SAVISUL 2.3 offers this update by itself.
 
 ## 2.3
 

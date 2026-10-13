@@ -25,10 +25,10 @@
 <link rel="apple-touch-icon" href="assets/img/icon-512.png">
 <link rel="preload" href="assets/fonts/Geologica.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/Onest.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/site.css">
-<link rel="stylesheet" href="assets/css/desktop.css">
-<link rel="stylesheet" href="assets/css/panel.css">
-<script type="module" src="assets/js/main.js"></script>
+<link rel="stylesheet" href="assets/css/site.css?v=24">
+<link rel="stylesheet" href="assets/css/desktop.css?v=24">
+<link rel="stylesheet" href="assets/css/panel.css?v=24">
+<script type="module" src="assets/js/main.js?v=24"></script>
 </head>
 <body>
 <!--
@@ -49,11 +49,11 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     <h1 data-i18n="heroTitle">A full Mac app. Not a notch widget.</h1>
     <p class="hero-lead" data-i18n="heroLead">SAVISUL is one native utility: command bar, clipboard and shelf, windows, per-app volume, automations, AI actions and a browser extension. The island around the camera is one part of that app.</p>
     <div class="hero-actions">
-      <a class="button primary" data-dmg href="download/SAVISUL-2.3.1.dmg" download><i data-icon="download" data-size="18"></i><span data-i18n="heroDownload">Download for Mac</span></a>
+      <a class="button primary" data-dmg href="download/SAVISUL-2.4.dmg" download><i data-icon="download" data-size="18"></i><span data-i18n="heroDownload">Download for Mac</span></a>
       <a class="button glass" href="#guide"><span data-i18n="heroGuide">Read the field guide</span></a>
       <a class="button glass" data-github hidden href="#" target="_blank" rel="noopener"><i data-icon="github" data-size="18"></i><span>GitHub</span></a>
     </div>
-    <p class="hero-meta" data-meta>Version 2.3.1 · macOS 14.2 or later · 12 MB · Free and open source</p>
+    <p class="hero-meta" data-meta>Version 2.4 · macOS 14.2 or later · 12 MB · Free and open source</p>
     <p class="hero-live">This desktop is live — hover the island.</p>
   </div>
   <div class="windows"></div>
@@ -162,12 +162,35 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   </section>
 
   <section class="chapter" id="wallpaper">
+    <style>
+      #wallpaper .wall-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+      #wallpaper .wall-tabs button { font: inherit; font-size: 14px; color: rgba(246, 240, 230, 0.74); background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 999px; padding: 8px 16px; cursor: pointer; transition: color 0.25s, background 0.25s, border-color 0.25s; }
+      #wallpaper .wall-tabs button:hover { color: #f6f0e6; border-color: rgba(230, 207, 164, 0.5); }
+      #wallpaper .wall-tabs button.on { color: #17110b; background: #e6cfa4; border-color: #e6cfa4; }
+      #wallpaper .wall-stage { position: relative; aspect-ratio: 27 / 16; margin-top: 20px; border-radius: 20px; overflow: hidden; cursor: crosshair; background: #0d0a08;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.08); touch-action: pan-y; }
+      #wallpaper .wall-stage img, #wallpaper .wall-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+      #wallpaper .wall-stage img { transition: opacity 0.35s ease; }
+      #wallpaper .wall-hint { position: absolute; left: 16px; bottom: 14px; font-size: 12px; letter-spacing: 0.03em; color: rgba(246, 240, 230, 0.86);
+        background: rgba(13, 10, 8, 0.5); padding: 6px 12px; border-radius: 999px; pointer-events: none; transition: opacity 0.4s; }
+      #wallpaper .wall-stage:hover .wall-hint { opacity: 0; }
+    </style>
     <div class="chapter-head">
       <h2 data-i18n="wallTitle">Sakura that never loops.</h2>
+      <div class="wall-tabs">
+        <button type="button" class="on" data-scene="hill" data-i18n="wallHill">Hill</button>
+        <button type="button" data-scene="bonsai" data-i18n="wallBonsai">Bonsai</button>
+        <button type="button" data-scene="bonsai-hill" data-i18n="wallBonsaiHill">Bonsai on a hill</button>
+      </div>
     </div>
     <div class="chapter-body">
       <p data-i18n="wallBody">A live wallpaper behind SAVISUL's panel, on the desktop, or both.</p>
-      <img src="assets/wallpaper.gif" alt="SAVISUL's live wallpaper: a sakura bonsai, a cherry tree on a hill under snowy mountains, and a bonsai on a hilltop, with petals falling" loading="lazy" width="720" height="450" style="display:block;width:100%;height:auto;margin-top:18px;border-radius:18px">
+      <div class="wall-stage" id="wall-stage">
+        <img src="assets/wall/hill.jpg" alt="A cherry tree in bloom on a grassy hill under snowy mountains at dusk" width="1600" height="948">
+        <canvas aria-hidden="true"></canvas>
+        <span class="wall-hint" data-i18n="wallHint">Move the pointer over the picture</span>
+      </div>
     </div>
   </section>
 
@@ -224,11 +247,11 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     <img class="final-icon" src="assets/img/icon-512.png" width="512" height="512" alt="SAVISUL app icon">
     <h2 data-i18n="finalTitle">Put your notch to work.</h2>
     <div class="hero-actions center">
-      <a class="button primary large" data-dmg href="download/SAVISUL-2.3.1.dmg" download><i data-icon="download" data-size="19"></i><span data-i18n="heroDownload">Download for Mac</span></a>
-      <a class="button glass large" data-zip href="download/SAVISUL-2.3.1.zip" download><span data-i18n="finalZip">ZIP archive</span></a>
+      <a class="button primary large" data-dmg href="download/SAVISUL-2.4.dmg" download><i data-icon="download" data-size="19"></i><span data-i18n="heroDownload">Download for Mac</span></a>
+      <a class="button glass large" data-zip href="download/SAVISUL-2.4.zip" download><span data-i18n="finalZip">ZIP archive</span></a>
       <a class="button glass large" data-github hidden href="#" target="_blank" rel="noopener"><i data-icon="github" data-size="19"></i><span>GitHub</span></a>
     </div>
-    <p class="hero-meta" data-final-meta>Version 2.3.1 · macOS 14.2 or later · 12 MB · Free and open source</p>
+    <p class="hero-meta" data-final-meta>Version 2.4 · macOS 14.2 or later · 12 MB · Free and open source</p>
     <p class="final-q" data-questions>Questions or ideas? mouldloft@gmail.com</p>
   </section>
 </main>
@@ -247,6 +270,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   </div>
   <p class="trademarks" data-i18n="footerTrademarks">Not affiliated with Apple Inc. or Google LLC. Mac, MacBook and macOS are trademarks of Apple Inc. Chrome is a trademark of Google LLC.</p>
 </footer>
-<script src="assets/js/qr.js" defer></script>
+<script src="assets/js/qr.js?v=24" defer></script>
+<script type="module" src="assets/js/wallpaper.js?v=24"></script>
 </body>
 </html>

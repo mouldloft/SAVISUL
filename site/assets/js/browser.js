@@ -1,7 +1,7 @@
 // A browser window running a replica of the SAVISUL extension's notch on a sample French news page.
-import { h, clear } from './dom.js';
-import { icon, mark } from './icons.js';
-import { t, lang, onLang } from './i18n.js';
+import { h, clear } from './dom.js?v=24';
+import { icon, mark } from './icons.js?v=24';
+import { t, lang, onLang } from './i18n.js?v=24';
 
 const ARTICLE = {
   fr: {

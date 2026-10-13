@@ -106,9 +106,15 @@ private struct WallpaperCard: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.bottom, 12)
             caption(model.text(.wpScene))
-            GlassSegmented(items: WallpaperLandscape.allCases.map { SegmentItem(value: $0, title: model.text($0.copy)) },
-                           selection: wallpaper.landscape) { wallpaper.setLandscape($0) }
-                .padding(.bottom, 12)
+            LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 12) {
+                ForEach(WallpaperLandscape.allCases.filter { $0 != .custom || !wallpaper.customPath.isEmpty }) { scene in
+                    WallpaperTile(title: model.text(scene.copy),
+                                  image: SakuraArt.thumbnail(scene == .custom ? wallpaper.customPath : scene.art(for: .desktop).resource),
+                                  selected: wallpaper.landscape == scene) { wallpaper.setLandscape(scene) }
+                }
+                WallpaperAddTile(title: model.text(.wpAdd)) { wallpaper.chooseCustomImage() }
+            }
+            .padding(.bottom, 14)
             caption(model.text(.wpWhere))
             GlassSegmented(items: WallpaperTarget.allCases.map { SegmentItem(value: $0, title: model.text($0.copy)) },
                            selection: wallpaper.target) { wallpaper.setTarget($0) }
@@ -127,6 +133,80 @@ private struct WallpaperCard: View {
             .font(.system(size: 11, weight: .semibold))
             .foregroundStyle(Palette.tertiary)
             .padding(.bottom, 6)
+    }
+}
+
+/// One wallpaper in the gallery: its preview, its name, and a check when it is the one playing.
+private struct WallpaperTile: View {
+    let title: String
+    let image: NSImage?
+    let selected: Bool
+    let action: () -> Void
+    @State private var hover = false
+
+    var body: some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 6) {
+                ZStack(alignment: .topTrailing) {
+                    Group {
+                        if let image {
+                            Image(nsImage: image).resizable().aspectRatio(contentMode: .fill)
+                        } else {
+                            Color.white.opacity(0.06)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 88)
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    if selected {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 17, weight: .semibold))
+                            .symbolRenderingMode(.palette)
+                            .foregroundStyle(Palette.onLight, Palette.accent)
+                            .padding(6)
+                    }
+                }
+                .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .strokeBorder(selected ? Palette.accent : Color.white.opacity(hover ? 0.28 : 0.1), lineWidth: selected ? 2 : 1))
+                .scaleEffect(hover && !selected ? 1.025 : 1)
+                Text(title)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(selected ? Palette.ink : Palette.secondary)
+                    .lineLimit(1)
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .onHover { hover = $0 }
+        .animation(.quickSpring, value: hover)
+        .animation(.quickSpring, value: selected)
+    }
+}
+
+/// The last tile: a dashed frame with a plus that opens a picture of the person's own.
+private struct WallpaperAddTile: View {
+    let title: String
+    let action: () -> Void
+    @State private var hover = false
+
+    var body: some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 6) {
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .strokeBorder(Color.white.opacity(hover ? 0.42 : 0.2), style: StrokeStyle(lineWidth: 1.2, dash: [5, 4]))
+                    .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Color.white.opacity(hover ? 0.06 : 0.03)))
+                    .frame(height: 88)
+                    .overlay(Image(systemName: "plus").font(.system(size: 20, weight: .medium)).foregroundStyle(Palette.accent))
+                Text(title)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(Palette.secondary)
+                    .lineLimit(1)
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .onHover { hover = $0 }
+        .animation(.quickSpring, value: hover)
     }
 }
 

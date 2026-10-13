@@ -1,11 +1,11 @@
 // Home page: the live desktop on top, the field guide below, both in English or Russian.
-import { h, clear, createBus, coarsePointer, copyText } from './dom.js';
-import { hydrateIcons, icon } from './icons.js';
-import { t, lang, apply, onLang, setLang } from './i18n.js';
-import { CONFIG } from './config.js';
-import { createDesktop } from './desktop.js';
-import { renderPlates } from './plates.js';
-import { playOverDesktop } from './face.js';
+import { h, clear, createBus, coarsePointer, copyText } from './dom.js?v=24';
+import { hydrateIcons, icon } from './icons.js?v=24';
+import { t, lang, apply, onLang, setLang } from './i18n.js?v=24';
+import { CONFIG } from './config.js?v=24';
+import { createDesktop } from './desktop.js?v=24';
+import { renderPlates } from './plates.js?v=24';
+import { playOverDesktop } from './face.js?v=24';
 
 const bus = createBus();
 const desktopRoot = document.querySelector('.desktop');

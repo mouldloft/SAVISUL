@@ -18,7 +18,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.3.1.dmg"><img src="https://img.shields.io/badge/Download-SAVISUL%202.3.1-DBC7A3?style=for-the-badge&logo=apple&logoColor=DBC7A3&labelColor=17130E" alt="Download SAVISUL 2.3.1" height="36"></a>
+  <a href="https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.4.dmg"><img src="https://img.shields.io/badge/Download-SAVISUL%202.4-DBC7A3?style=for-the-badge&logo=apple&logoColor=DBC7A3&labelColor=17130E" alt="Download SAVISUL 2.4" height="36"></a>
 </p>
 
 <p align="center">

@@ -1,8 +1,8 @@
 // Keyboard surfaces: command bar (⌥Space), clipboard history (⌃⌥V) and the window switcher (⌥Tab).
-import { h, clear } from './dom.js';
-import { icon, mark } from './icons.js';
-import { t, lang, onLang } from './i18n.js';
-import { CONFIG } from './config.js';
+import { h, clear } from './dom.js?v=24';
+import { icon, mark } from './icons.js?v=24';
+import { t, lang, onLang } from './i18n.js?v=24';
+import { CONFIG } from './config.js?v=24';
 
 // MARK: Math
 

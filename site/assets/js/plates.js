@@ -1,10 +1,10 @@
 // Small working plates beside each field-guide chapter, built from the same parts as the desktop.
-import { h, clear } from './dom.js';
-import { icon, mark } from './icons.js';
-import { t, lang } from './i18n.js';
-import { evaluate, convert, fixLayout } from './overlays.js';
-import { createPanelCard } from './panel.js';
-import { createFaceDemo } from './face.js';
+import { h, clear } from './dom.js?v=24';
+import { icon, mark } from './icons.js?v=24';
+import { t, lang } from './i18n.js?v=24';
+import { evaluate, convert, fixLayout } from './overlays.js?v=24';
+import { createPanelCard } from './panel.js?v=24';
+import { createFaceDemo } from './face.js?v=24';
 
 const eq = () => h('span', { class: 'eq', 'aria-hidden': 'true' }, h('i'), h('i'), h('i'), h('i'));
 
