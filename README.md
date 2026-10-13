@@ -22,7 +22,7 @@
 </p>
 
 <p align="center">
-  <sub>Free · 4 MB · macOS 14.2 or later on Apple silicon</sub><br>
+  <sub>Free · 12 MB · macOS 14.2 or later on Apple silicon</sub><br>
   <a href="https://www.savisul.com">Website</a>
   &nbsp;·&nbsp;
   <a href="#keyboard-shortcuts">Shortcuts</a>
@@ -38,7 +38,7 @@
 
 <table>
   <tr>
-    <td width="25%" valign="top"><b>Native and light</b><br>Swift, SwiftUI and AppKit. A 4 MB download, no Electron.</td>
+    <td width="25%" valign="top"><b>Native and light</b><br>Swift, SwiftUI and AppKit. A 12 MB download, no Electron.</td>
     <td width="25%" valign="top"><b>Private by default</b><br>No account, no analytics, no telemetry.</td>
     <td width="25%" valign="top"><b>Your AI, your keys</b><br>Eight providers, any OpenAI-compatible server or a local model.</td>
     <td width="25%" valign="top"><b>Four languages</b><br>English, Russian, Ukrainian and French.</td>
