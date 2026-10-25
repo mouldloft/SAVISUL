@@ -467,9 +467,27 @@ final class FaceUnlock {
         }
     }
 
-    private func type(_ password: String) {
+    private func type(_ password: String, attempt: Int = 0) {
+        guard entering, policy.lockedAt != nil else {
+            entering = false
+            FaceLog.write("not typed: the lock ended before the password went in")
+            return
+        }
+        guard LockScreen.passwordFieldIsUp else {
+            // The field can let go of the keyboard for a moment while the lock screen settles. It used to end the unlock
+            // there, without a word in the log; now it waits for the field to come back, as before the keychain read.
+            if attempt < 8 {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak self] in
+                    MainActor.assumeIsolated { self?.type(password, attempt: attempt + 1) }
+                }
+            } else {
+                entering = false
+                showResting()
+                FaceLog.write("not typed: the password field let go of the keyboard (secure input: \(LockScreen.keyboardOwner))")
+            }
+            return
+        }
         defer { entering = false }
-        guard entering, policy.lockedAt != nil, LockScreen.passwordFieldIsUp else { return }
         let typed = Date()
         typedAt = typed
         let owner = LockScreen.keyboardOwner

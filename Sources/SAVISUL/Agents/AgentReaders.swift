@@ -685,6 +685,140 @@ final class CopilotReader: AgentReader {
     }
 }
 
+// MARK: - Mould Engine Studio
+
+/// Mould Engine Studio says what it does in a small file it keeps current (`activity.json`: whether it works or waits
+/// for the person, on which project, with which model, and the tokens of the call in flight), and counts every model
+/// call in a monthly usage log; from the logs come today's tokens, cost and calls, and the week's tokens.
+final class MouldReader: AgentReader {
+    let kind = AgentKind.mould
+    private let support: URL
+    /// One day's calls in a usage log.
+    private struct Day {
+        var tokens = 0
+        var cost = 0.0
+        var calls = 0
+        var last: Date?
+        var model: String?
+    }
+    /// The logs the last seven days fall in (this month's, and last month's early in a month), by day; each is read
+    /// again only when it grew.
+    private var logs: [String: (size: UInt64, days: [Int: Day])] = [:]
+    /// The work under way when it was last seen, for the finish when it stops.
+    private var underway: (since: Date, project: String?, task: String?)?
+
+    private struct Activity: Decodable {
+        var working: Bool
+        var waiting: Bool?
+        var question: String?
+        var model: String?
+        var modelID: String?
+        var project: String?
+        var projectPath: String?
+        var task: String?
+        var since: Date?
+        var tokens: Int?
+        var updated: Date
+        var pid: Int32?
+    }
+
+    /// Studio's support folder; tests hand in one of their own.
+    init(support: URL = home.appendingPathComponent("Library/Application Support/Mould Engine Studio")) {
+        self.support = support
+    }
+
+    func scan(now: Date, initial: Bool) -> (AgentStatus, [AgentFinish]) {
+        var status = AgentStatus(kind: kind)
+        status.installed = FileManager.default.fileExists(atPath: support.path)
+        guard status.installed else { return (status, []) }
+        status.surface = .desktop
+        readLogs(now: now)
+        let today = day(AgentTime.day(now))
+        status.tokensToday = today.tokens
+        status.tokensWeek = AgentWeek.days(now).reduce(0) { $0 + day($1).tokens }
+        status.costToday = today.cost > 0 ? today.cost : nil
+        status.sessionsToday = today.calls
+        status.lastActive = today.last
+        status.model = today.model.map(Self.readable)
+        var finishes: [AgentFinish] = []
+        if let activity = readActivity(), activity.working, alive(activity.pid),
+           now.timeIntervalSince(activity.updated) < 900 || activity.waiting == true {
+            status.working = true
+            status.runs = 1
+            status.since = activity.since ?? activity.updated
+            status.model = activity.model ?? activity.modelID.map(Self.readable) ?? status.model
+            status.project = activity.project ?? AgentText.project(activity.projectPath)
+            status.projectPath = activity.projectPath
+            status.task = activity.task.flatMap { AgentText.snippet($0) }
+            status.waiting = activity.waiting == true
+            status.question = status.waiting ? activity.question.flatMap { AgentText.snippet($0) } : nil
+            // The call in flight isn't in the log yet.
+            status.tokensToday += activity.tokens ?? 0
+            status.tokensWeek += activity.tokens ?? 0
+            status.lastActive = max(status.lastActive ?? .distantPast, activity.updated)
+            underway = (status.since ?? now, status.project, status.task)
+        } else if let was = underway {
+            underway = nil
+            if !initial { finishes.append(AgentFinish(kind: kind, project: was.project, duration: now.timeIntervalSince(was.since), error: nil, task: was.task)) }
+        }
+        return (status, finishes)
+    }
+
+    private func readActivity() -> Activity? {
+        guard let data = try? Data(contentsOf: support.appendingPathComponent("activity.json")) else { return nil }
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return try? decoder.decode(Activity.self, from: data)
+    }
+
+    /// Studio left the file saying it works, then quit or crashed: its process is gone.
+    private func alive(_ pid: Int32?) -> Bool {
+        guard let pid, pid > 0 else { return true }
+        return kill(pid, 0) == 0 || errno == EPERM
+    }
+
+    /// A day's calls across the logs read.
+    private func day(_ index: Int) -> Day {
+        var total = Day()
+        for log in logs.values {
+            guard let day = log.days[index] else { continue }
+            total.tokens += day.tokens
+            total.cost += day.cost
+            total.calls += day.calls
+            if let last = day.last, last >= (total.last ?? .distantPast) { (total.last, total.model) = (last, day.model) }
+        }
+        return total
+    }
+
+    private func readLogs(now: Date) {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM"
+        let paths = Set((0..<7).map { support.appendingPathComponent("Usage/\(formatter.string(from: now.addingTimeInterval(-86_400 * Double($0)))).jsonl").path })
+        logs = logs.filter { paths.contains($0.key) }
+        for path in paths {
+            guard let state = FileState.now(path) else { logs[path] = nil; continue }
+            if logs[path]?.size == state.size { continue }
+            var days: [Int: Day] = [:]
+            for line in (FileManager.default.contents(atPath: path) ?? Data()).split(separator: UInt8(ascii: "\n")) {
+                guard let row = AgentLog.object(Data(line)), let date = AgentTime.parse(row["date"]) else { continue }
+                var day = days[AgentTime.day(date), default: Day()]
+                day.tokens += ((row["input"] as? NSNumber)?.intValue ?? 0) + ((row["output"] as? NSNumber)?.intValue ?? 0)
+                day.cost += (row["cost"] as? NSNumber)?.doubleValue ?? 0
+                day.calls += 1
+                if date >= (day.last ?? .distantPast) { (day.last, day.model) = (date, row["model"] as? String) }
+                days[AgentTime.day(date)] = day
+            }
+            logs[path] = (state.size, days)
+        }
+    }
+
+    /// "deepseek:deepseek-v4-pro" → "deepseek-v4-pro": the engine's id without its provider, when no title came with it.
+    static func readable(_ id: String) -> String {
+        id.split(separator: ":", maxSplits: 1).last.map(String.init) ?? id
+    }
+}
+
 // MARK: - Cursor
 
 final class CursorReader: AgentReader {

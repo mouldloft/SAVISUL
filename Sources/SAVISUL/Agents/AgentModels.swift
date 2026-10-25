@@ -3,6 +3,8 @@ import SwiftUI
 
 enum AgentKind: String, CaseIterable, Sendable {
     case claude, codex, cursor, opencode, copilot
+    /// Mould Engine Studio, Mould Loft's own AI editor.
+    case mould
 
     var title: String {
         switch self {
@@ -11,6 +13,7 @@ enum AgentKind: String, CaseIterable, Sendable {
         case .cursor: "Cursor"
         case .opencode: "OpenCode"
         case .copilot: "Copilot"
+        case .mould: "Mould Engine Studio"
         }
     }
 
@@ -21,6 +24,7 @@ enum AgentKind: String, CaseIterable, Sendable {
         case .cursor: "Cursor"
         case .opencode: "OpenCode"
         case .copilot: "Copilot"
+        case .mould: "Studio"
         }
     }
 
@@ -31,6 +35,7 @@ enum AgentKind: String, CaseIterable, Sendable {
         case .cursor: Color(red: 0.88, green: 0.88, blue: 0.90)
         case .opencode: Color(red: 0.98, green: 0.82, blue: 0.42)
         case .copilot: Color(red: 0.72, green: 0.58, blue: 0.98)
+        case .mould: Color(red: 0.36, green: 0.58, blue: 1.0)
         }
     }
 
@@ -41,6 +46,7 @@ enum AgentKind: String, CaseIterable, Sendable {
         case .cursor: "cursorarrow.rays"
         case .opencode: "chevron.left.forwardslash.chevron.right"
         case .copilot: "airplane"
+        case .mould: "m.square"
         }
     }
 }
@@ -91,6 +97,10 @@ struct AgentStatus: Equatable, Sendable, Identifiable {
     var sessionsToday = 0
     var limitHit = false
     var limitUntil: Date?
+    /// The agent stopped to ask the person: a change waits for their answer, in its own window.
+    var waiting = false
+    /// What it asks, in a line.
+    var question: String?
 }
 
 enum AgentSurface: String, Sendable {
@@ -267,6 +277,16 @@ struct AgentFinish: Equatable, Sendable {
 }
 
 /// Reads a log file incrementally: each call returns only the complete lines written since the last call.
+/// A file's size and date as they are on disk now. A URL keeps the resource values it was asked for until the run loop
+/// turns, and the agents are read on a queue that has none: asked again, the same URL gave the same size forever, so
+/// after the first scan no new line of a session was read, and the island only heard of work after a relaunch.
+enum FileState {
+    static func now(_ path: String) -> (size: UInt64, modified: Date)? {
+        guard let attributes = try? FileManager.default.attributesOfItem(atPath: path) else { return nil }
+        return ((attributes[.size] as? NSNumber)?.uint64Value ?? 0, attributes[.modificationDate] as? Date ?? .distantPast)
+    }
+}
+
 final class LogTail {
     let url: URL
     private(set) var offset: UInt64 = 0
@@ -276,18 +296,16 @@ final class LogTail {
     init(_ url: URL) { self.url = url }
 
     func changed() -> Bool {
-        guard let values = try? url.resourceValues(forKeys: [.contentModificationDateKey, .fileSizeKey]) else { return false }
-        let date = values.contentModificationDate ?? .distantPast
-        let size = UInt64(values.fileSize ?? 0)
-        return date != modified || size != offset + UInt64(carry.count)
+        guard let state = FileState.now(url.path) else { return false }
+        return state.modified != modified || state.size != offset + UInt64(carry.count)
     }
 
     /// Every complete line written since the last call. Reads in chunks, so a large session log
     /// is counted whole (a tail-only read made totals drop after each relaunch) without loading it at once.
     func forEachLine(limit: Int = 1 << 31, chunk: Int = 8 << 20, _ body: (Data) -> Void) {
-        guard let values = try? url.resourceValues(forKeys: [.contentModificationDateKey, .fileSizeKey]) else { return }
-        modified = values.contentModificationDate ?? Date()
-        let size = UInt64(values.fileSize ?? 0)
+        guard let state = FileState.now(url.path) else { return }
+        modified = state.modified
+        let size = state.size
         let consumed = offset + UInt64(carry.count)
         if size < consumed {
             offset = 0
@@ -331,7 +349,7 @@ final class LogTail {
         let start = size > UInt64(bytes) ? size - UInt64(bytes) : 0
         try? handle.seek(toOffset: start)
         guard let data = try? handle.readToEnd() else { return nil }
-        modified = (try? url.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? Date()
+        modified = FileState.now(url.path)?.modified ?? Date()
         offset = size
         return String(decoding: data, as: UTF8.self)
     }

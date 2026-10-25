@@ -35,8 +35,7 @@ final class CursorTracking: @unchecked Sendable {
         let day = AgentTime.day(now)
         guard now.timeIntervalSince(checked) > 15 || day != cachedDay else { return cached }
         checked = now
-        let changed = [url, URL(fileURLWithPath: url.path + "-wal")]
-            .compactMap { try? $0.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate }.max() ?? .distantPast
+        let changed = [url.path, url.path + "-wal"].compactMap { FileState.now($0)?.modified }.max() ?? .distantPast
         guard changed != stamp || day != cachedDay else { return cached }
         stamp = changed
         cachedDay = day

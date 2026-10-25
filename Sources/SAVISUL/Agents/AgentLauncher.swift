@@ -80,6 +80,18 @@ final class AgentLauncher {
         return apps
     }
 
+    /// Mould Engine Studio brought forward, on the project it works on when there is one.
+    static func openStudio(_ project: String?) {
+        guard let app = NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.mouldloft.studio") else { return }
+        let configuration = NSWorkspace.OpenConfiguration()
+        configuration.activates = true
+        if let project, FileManager.default.fileExists(atPath: project) {
+            NSWorkspace.shared.open([URL(fileURLWithPath: project)], withApplicationAt: app, configuration: configuration)
+        } else {
+            NSWorkspace.shared.openApplication(at: app, configuration: configuration)
+        }
+    }
+
     private nonisolated static let tools: [(AgentKind, [String])] = [
         (.claude, ["claude"]), (.codex, ["codex"]), (.cursor, ["cursor-agent", "agent"]), (.opencode, ["opencode"]), (.copilot, ["copilot"])
     ]
@@ -134,6 +146,9 @@ final class AgentLauncher {
         case .copilot:
             let help = Shell.run(tool.path, ["--help"], timeout: 4)?.text ?? ""
             return help.contains("--interactive") ? .flag("--interactive") : .clipboard
+        case .mould:
+            // Studio is an app with its own chat, not a tool in the terminal; it isn't among the tools started here.
+            return .clipboard
         }
     }
 

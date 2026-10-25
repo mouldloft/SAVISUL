@@ -2,8 +2,9 @@ import AppKit
 import Foundation
 import Security
 
-/// Updates SAVISUL in place from its GitHub releases: no new download to open, no Terminal. The new build must carry
-/// SAVISUL's own signature, and since it is the same signature, macOS keeps every permission the old build had.
+/// Updates SAVISUL in place: no new download to open, no Terminal. Mould Loft's SAVISUL takes only its own builds from
+/// savisul.com, signed with Mould Loft's Developer ID; the open-source build takes its GitHub releases. While the
+/// signature stays the same, macOS keeps every permission the old build had.
 @MainActor @Observable
 final class Updater {
     static let shared = Updater()
@@ -19,9 +20,23 @@ final class Updater {
     @ObservationIgnored private var archive: URL?
     @ObservationIgnored private var timer: Timer?
 
-    /// Only a build signed with SAVISUL's certificate may replace this one.
-    nonisolated static let requirement = #"identifier "com.savisul.menu" and certificate root = H"dad7d8d7971ef0d2e532e257cfceaaefa76feb89""#
+    #if SAVISUL_CLOUD
+    /// Only a build signed with Mould Loft's Developer ID (team QR26Z476AT) and so notarized by Apple, as savisul.com hands
+    /// out, may replace this one. The Developer ID fields make sure it is a Developer ID certificate, not a development one
+    /// of the same team.
+    nonisolated static let requirement = #"identifier "com.savisul.menu" and anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] and certificate leaf[field.1.2.840.113635.100.6.1.13] and certificate leaf[subject.OU] = "QR26Z476AT""#
+    #else
+    /// The open-source build: signed with SAVISUL's own certificate, as its GitHub releases are, or with Mould Loft's
+    /// Developer ID.
+    nonisolated static let requirement = #"identifier "com.savisul.menu" and (certificate root = H"dad7d8d7971ef0d2e532e257cfceaaefa76feb89" or (anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] and certificate leaf[field.1.2.840.113635.100.6.1.13] and certificate leaf[subject.OU] = "QR26Z476AT"))"#
+    #endif
+    #if SAVISUL_CLOUD
+    /// Mould Loft's own SAVISUL, with Mould Cloud, updates from savisul.com: GitHub's releases are the open-source build,
+    /// and updating to one would take Mould Cloud away. The feed has a GitHub release's shape.
+    private static let feed = URL(string: "https://www.savisul.com/updates/latest.json")!
+    #else
     private static let feed = URL(string: "https://api.github.com/repos/mouldloft/SAVISUL/releases/latest")!
+    #endif
 
     var current: String { Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0" }
 
@@ -140,7 +155,7 @@ final class Updater {
         return nil
     }
 
-    /// The bundle is SAVISUL and is signed with SAVISUL's certificate, unaltered.
+    /// The bundle is SAVISUL, signed as `requirement` asks, unaltered.
     nonisolated static func isSAVISUL(_ app: URL) -> Bool {
         var code: SecStaticCode?, requirement: SecRequirement?
         guard SecStaticCodeCreateWithPath(app as CFURL, [], &code) == errSecSuccess, let code,

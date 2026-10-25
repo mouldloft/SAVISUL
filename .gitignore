@@ -13,3 +13,6 @@ tools/extension-test/.bin/
 tools/extension-test/package-lock.json
 
 .DS_Store
+
+# Mould Engine build output
+MouldEngine/.build/

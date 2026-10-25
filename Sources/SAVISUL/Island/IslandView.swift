@@ -51,7 +51,9 @@ enum IslandLayout {
             }
             return CGSize(width: notch.width + IslandModel.wing * 2 + ear(.collapsed) * 2, height: notch.height)
         case .peek:
-            return CGSize(width: max(IslandModel.peekWidth, notch.width + IslandModel.wing * 2) + ear(.peek) * 2,
+            // A question with two buttons gets a wider drop than a plain notice.
+            let width = model.notice?.secondTitle == nil ? IslandModel.peekWidth : 480
+            return CGSize(width: max(width, notch.width + IslandModel.wing * 2) + ear(.peek) * 2,
                           height: notch.height + IslandModel.peekContent)
         case .expanded:
             return CGSize(width: IslandModel.expandedWidth + ear(.expanded) * 2, height: notch.height + model.contentHeight)
@@ -117,7 +119,8 @@ struct IslandRoot: View {
             .shadow(color: .black.opacity(model.mode == .collapsed ? 0 : 0.55), radius: model.mode == .expanded ? 26 : 14, y: 10)
             .contentShape(shape)
             .onTapGesture {
-                if model.mode != .expanded { model.expand(IslandActivity.openingTab(suite)) }
+                // A click beside a notice's buttons leaves the notice in place rather than opening the island over it.
+                if model.mode != .expanded && !model.noticeHasButtons { model.expand(IslandActivity.openingTab(suite)) }
             }
             .onDrop(of: [.fileURL, .url, .image, .plainText], isTargeted: Binding(get: { model.dropTargeted }, set: { model.dropTargeted = $0 })) { providers in
                 guard suite.settings.islandShelf else { return false }
@@ -193,7 +196,12 @@ private struct WingsRow: View {
         case .media:
             Artwork(image: suite.nowPlaying.artwork, size: 22, radius: 6)
         case .agent(let kind):
-            AgentGlyph(kind: kind, size: 20, working: true)
+            if suite.settings.islandPanda {
+                // An agent that stopped to ask: the panda asks too.
+                PandaView(mood: suite.agents.status(kind).waiting ? .ask : .working, size: 26, tint: kind.tint)
+            } else {
+                AgentGlyph(kind: kind, size: 20, working: true)
+            }
         case .live(let id):
             if let live = suite.live.items.first(where: { $0.id == id }) { LiveRing(activity: live, size: 20) }
         case .timer, .ringing:
@@ -224,6 +232,9 @@ private struct WingsRow: View {
             }
         case .media:
             EqualizerBars(playing: suite.nowPlaying.playing, tint: suite.nowPlaying.tint, levels: suite.spectrumLevels, count: 4, height: 13)
+        case .agent(let kind) where suite.agents.status(kind).waiting:
+            Image(systemName: "hand.raised.fill").font(.system(size: 13, weight: .semibold)).foregroundStyle(Palette.accent)
+                .symbolEffect(.pulse)
         case .agent(let kind):
             let status = suite.agents.status(kind)
             TimelineView(.periodic(from: .now, by: 1)) { context in
@@ -346,7 +357,18 @@ private struct NoticeRow: View {
     var body: some View {
         HStack(spacing: 12) {
             ZStack {
-                if let image = notice.image {
+                if let mood = notice.mascot {
+                    PandaView(mood: mood, size: 52)
+                        .offset(y: -1)
+                    if let image = notice.image {
+                        // The panda brings what the notice is about: the downloaded file, the app that called.
+                        Image(nsImage: image).resizable().aspectRatio(contentMode: .fit).frame(width: 20, height: 20)
+                            .shadow(color: .black.opacity(0.5), radius: 2, y: 1)
+                            .offset(x: 17, y: 12)
+                            .scaleEffect(shown ? 1 : 0.4)
+                            .animation(.spring(response: 0.4, dampingFraction: 0.6).delay(0.8), value: shown)
+                    }
+                } else if let image = notice.image {
                     Image(nsImage: image).resizable().aspectRatio(contentMode: .fit).frame(width: 30, height: 30)
                         .scaleEffect(shown ? 1 : 0.55)
                         .animation(.spring(response: 0.38, dampingFraction: 0.58), value: shown)
@@ -356,7 +378,7 @@ private struct NoticeRow: View {
                         .symbolEffect(.bounce, value: shown)
                 }
             }
-            .frame(width: 34, height: 34)
+            .frame(width: notice.mascot == nil ? 34 : 52, height: 34)
             .onAppear { shown = true }
             VStack(alignment: .leading, spacing: 2) {
                 Text(notice.title).font(.system(size: 13, weight: .semibold)).foregroundStyle(Palette.ink).lineLimit(1)
@@ -368,21 +390,35 @@ private struct NoticeRow: View {
             if let level = notice.level {
                 LevelPill(value: level, tint: notice.tint).frame(width: 110)
             } else if let title = notice.actionTitle, let action = notice.action {
-                Button {
-                    action()
-                    dismiss()
-                } label: {
-                    Text(title).font(.system(size: 12, weight: .semibold)).foregroundStyle(Palette.onLight)
-                        .padding(.horizontal, 12).frame(height: 26)
-                        .background(Capsule().fill(notice.tint))
+                HStack(spacing: 8) {
+                    if let secondTitle = notice.secondTitle, let second = notice.second {
+                        Button {
+                            second()
+                            dismiss()
+                        } label: {
+                            Text(secondTitle).font(.system(size: 12, weight: .semibold)).foregroundStyle(Palette.ink)
+                                .padding(.horizontal, 12).frame(height: 26)
+                                .background(Capsule().strokeBorder(Color.white.opacity(0.3), lineWidth: 1))
+                        }
+                        .buttonStyle(PressableStyle())
+                    }
+                    Button {
+                        action()
+                        dismiss()
+                    } label: {
+                        Text(title).font(.system(size: 12, weight: .semibold)).foregroundStyle(Palette.onLight)
+                            .padding(.horizontal, 12).frame(height: 26)
+                            .background(Capsule().fill(notice.tint))
+                    }
+                    .buttonStyle(PressableStyle())
                 }
-                .buttonStyle(PressableStyle())
             }
         }
         .padding(.horizontal, 16)
         .frame(height: IslandModel.peekContent)
         .contentShape(Rectangle())
-        .onTapGesture(perform: dismiss)
+        // A question waits for its buttons; a stray click on it shouldn't send it away.
+        .onTapGesture { if notice.secondTitle == nil { dismiss() } }
     }
 }
 
@@ -429,6 +465,12 @@ private struct ExpandedIsland: View {
 
     private var header: some View {
         HStack(spacing: 0) {
+            if suite.settings.islandPanda {
+                PandaView(mood: companionMood, size: 30, tint: suite.agents.working.first?.kind.tint ?? Palette.accent)
+                    .id(companionMood)
+                    .padding(.leading, 12)
+                    .help(PandaPhrases.companion.text)
+            }
             HStack(spacing: 4) {
                 ForEach(tabs) { tab in
                     TabChip(tab: tab, selected: model.tab == tab) {
@@ -436,7 +478,7 @@ private struct ExpandedIsland: View {
                     }
                 }
             }
-            .padding(.leading, 12)
+            .padding(.leading, suite.settings.islandPanda ? 6 : 12)
             Spacer(minLength: model.notch.width + 16)
             HStack(spacing: 8) {
                 StatusCluster(suite: suite)
@@ -450,6 +492,15 @@ private struct ExpandedIsland: View {
             .padding(.trailing, 12)
         }
         .padding(.top, 2)
+    }
+
+    /// The panda in the open island keeps you company and shows what's going on: typing along with an agent,
+    /// dancing to music, asleep late at night, otherwise waving hello.
+    private var companionMood: PandaMood {
+        if !suite.agents.working.isEmpty { return .working }
+        if suite.nowPlaying.playing { return .dance }
+        if Calendar.current.component(.hour, from: Date()) < 6 { return .sleepy }
+        return .hello
     }
 
     private var tabs: [IslandTab] {

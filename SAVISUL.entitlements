@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  What SAVISUL may still do under the hardened runtime that a Developer ID build (signed, notarized) runs with. Each one
+  matches a purpose string in Info.plist, and macOS still asks the person before any of them is used:
+  the camera (the mirror in the notch, Face Unlock), the sound of other apps (per-app volume), Apple events (Finder,
+  the browser's call tab, the administrator password for closed-lid mode), the calendar (meetings in the notch) and the
+  Photos library (finding a picture by what is in it, when the person turns that on).
+-->
+<plist version="1.0">
+<dict>
+	<key>com.apple.security.device.camera</key>
+	<true/>
+	<key>com.apple.security.device.audio-input</key>
+	<true/>
+	<key>com.apple.security.automation.apple-events</key>
+	<true/>
+	<key>com.apple.security.personal-information.calendars</key>
+	<true/>
+	<key>com.apple.security.personal-information.photos-library</key>
+	<true/>
+</dict>
+</plist>

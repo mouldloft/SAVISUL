@@ -2,6 +2,9 @@
 # Usage: ./build.sh [--no-install]
 set -euo pipefail
 cd "$(dirname "$0")"
+# The Command Line Tools' Swift and their macOS 15.2 SDK even when xcode-select picks Xcode (SAVISUL Mobile needs it):
+# Xcode's newer SDK would change how SAVISUL looks and behaves.
+if [[ -d /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk ]]; then export DEVELOPER_DIR=/Library/Developer/CommandLineTools; fi
 INSTALL=1
 [[ "${1:-}" == "--no-install" ]] && INSTALL=0
 BUNDLE_ID="com.savisul.menu"
@@ -43,12 +46,30 @@ clang -c Sources/SMCBridge/smc_bridge.c \
   -mmacosx-version-min=14.2 \
   -O2 \
   -o .build/smc_bridge.o
+# Mould Engine, the proprietary engine the assistant runs on, is linked in when its folder is here. A public checkout
+# has no MouldEngine folder and builds SAVISUL without the assistant.
+engine=()
+if [[ -f MouldEngine/build.sh ]]; then
+  zsh MouldEngine/build.sh release
+  ENGINE_LIB="$PWD/MouldEngine/.build/clt/release"
+  engine=(-D MOULD_ENGINE -I "$ENGINE_LIB" -L "$ENGINE_LIB"
+          -lMouldCore -lMouldRuntime -lMouldContext -lMouldMemory -lMouldRouter -lMouldGraph -lMouldFlow -lMouldMind -lMouldMac -lMouldEngine
+          -lsqlite3 -framework Network)
+fi
+# SAVISUL Cloud, the account that links SAVISUL Mobile, is in Mould Loft's own build only: a public checkout has no
+# Cloud folder.
+cloud=()
+if [[ -d Cloud/Mac ]]; then
+  cloud=(-D SAVISUL_CLOUD Cloud/Shared/*.swift Cloud/Mac/*.swift)
+fi
 swiftc -parse-as-library \
   -target arm64-apple-macos14.2 \
   -sdk "$PWD/$SDK" \
   -vfsoverlay "$PWD/.build/overlay.json" \
   -module-cache-path "$PWD/.build/module-cache" \
   -O \
+  "${engine[@]}" \
+  "${cloud[@]}" \
   -I Sources/SMCBridge/include \
   -framework AppKit \
   -framework SwiftUI \
@@ -69,6 +90,9 @@ swiftc -parse-as-library \
   -framework CoreMedia \
   -framework CoreMediaIO \
   -framework SpriteKit \
+  -framework CoreBluetooth \
+  -framework Photos \
+  -framework Vision \
   Sources/SAVISUL/**/*.swift \
   .build/smc_bridge.o \
   -o .build/SAVISUL
@@ -94,7 +118,11 @@ cp .build/libSAVISULMedia.dylib "$APP/Contents/Frameworks/libSAVISULMedia.dylib"
 cp .build/savisul-fan-helper "$APP/Contents/Resources/savisul-fan-helper"
 chmod 755 "$APP/Contents/Resources/savisul-fan-helper"
 cp Info.plist "$APP/Contents/Info.plist"
-cp Resources/Wallpapers/*.heic "$APP/Contents/Resources/"
+cp Resources/Wallpapers/*.heic Resources/Panda/*.m4a "$APP/Contents/Resources/"
+if (( ${#cloud} )); then
+  mkdir -p "$APP/Contents/Resources/Cloud"
+  cp Cloud/Server/server.mjs "$APP/Contents/Resources/Cloud/server.mjs"
+fi
 chmod +x "$APP/Contents/MacOS/SAVISUL"
 .build/SAVISUL --render-icon .build/AppIcon.iconset
 iconutil -c icns .build/AppIcon.iconset -o "$APP/Contents/Resources/AppIcon.icns"
@@ -111,7 +139,16 @@ xattr -cr "$APP"
 SIGNED="ad-hoc"
 MEDIA="$APP/Contents/Frameworks/libSAVISULMedia.dylib"
 FANS="$APP/Contents/Resources/savisul-fan-helper"
-if KC="$(zsh scripts/signing.sh 2>/dev/null)" &&
+# On a Mac with Mould Loft's Developer ID (the one savisul.com's builds carry), a build is signed with it, under the same
+# hardened runtime and entitlements, so one installed here keeps the privacy grants and keychain access the official
+# build was given. SAVISUL_LOCAL_SIGNING=1 keeps the SAVISUL certificate (scripts/release.sh's update for 2.6.1).
+DEVID="$(security find-identity -v -p codesigning 2>/dev/null | sed -n 's/.*"\(Developer ID Application: .* (QR26Z476AT)\)".*/\1/p' | head -1)"
+if [[ -z "${SAVISUL_LOCAL_SIGNING:-}" && -n "$DEVID" ]] &&
+   codesign --force --timestamp=none --options runtime --sign "$DEVID" "$MEDIA" &&
+   codesign --force --timestamp=none --options runtime --sign "$DEVID" --identifier com.savisul.fanhelper "$FANS" &&
+   codesign --force --timestamp=none --options runtime --sign "$DEVID" --identifier "$BUNDLE_ID" --entitlements SAVISUL.entitlements "$APP"; then
+  SIGNED="$DEVID"
+elif KC="$(zsh scripts/signing.sh 2>/dev/null)" &&
    codesign --force --timestamp=none --keychain "$KC" --sign "SAVISUL Local Signing" "$MEDIA" 2>/dev/null &&
    codesign --force --timestamp=none --keychain "$KC" --sign "SAVISUL Local Signing" --identifier com.savisul.fanhelper "$FANS" 2>/dev/null &&
    codesign --force --timestamp=none --keychain "$KC" --sign "SAVISUL Local Signing" --identifier "$BUNDLE_ID" "$APP" 2>/dev/null; then

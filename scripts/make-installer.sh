@@ -1,14 +1,21 @@
 #!/bin/zsh
-# Builds dist/SAVISUL-<version>.dmg — the file to send to other people.
+# Builds dist/SAVISUL-<version>.dmg — the file to send to other people — and dist/SAVISUL-<version>.zip.
+#
+# Two kinds. By default, the app as build.sh signs it (the SAVISUL certificate), with an install command and a note for
+# Gatekeeper, which knows nothing of that certificate. With SIGN_IDENTITY set to a Developer ID (scripts/release.sh
+# does this) and APP_SOURCE to the app it signed and Apple notarized: SAVISUL and Applications to drag it onto, the
+# image itself signed, notarized and stapled too, and the zip just the app — both open at once, with no warning.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+NOTARIZED=${SIGN_IDENTITY:+1}
+source scripts/notarize.zsh
 
-if [[ "${SKIP_BUILD:-}" != 1 ]]; then
+if [[ "${SKIP_BUILD:-}" != 1 && -z "$NOTARIZED" ]]; then
   zsh ./build.sh --no-install
 fi
 
 VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' Info.plist)"
-APP="$PWD/dist/SAVISUL.app"
+APP="${APP_SOURCE:-$PWD/dist/SAVISUL.app}"
 STAGE="$PWD/.build/dmg-root"
 # Finder writes the path of this image into the DMG's window layout, so it is
 # made outside the home folder, whose name is the builder's account name.
@@ -23,7 +30,7 @@ swiftc -O -framework AppKit \
   -vfsoverlay "$PWD/.build/overlay.json" \
   -module-cache-path "$PWD/.build/module-cache" \
   -o "$PWD/.build/dmg-background" scripts/dmg_background.swift
-"$PWD/.build/dmg-background" "$BACKGROUND"
+"$PWD/.build/dmg-background" "$BACKGROUND" ${NOTARIZED:+drag}
 
 rm -rf "$STAGE"
 mkdir -p "$STAGE/.background"
@@ -32,10 +39,15 @@ ditto "$APP" "$STAGE/SAVISUL.app"
 # the permissions a person gave SAVISUL across updates, and the in-app updater accepts only builds that carry it.
 # Gatekeeper never judges it: the install command and the updater both leave the quarantine check out.
 codesign --verify --strict "$STAGE/SAVISUL.app"
-if ! codesign -dr - "$STAGE/SAVISUL.app" 2>&1 | grep -q 'certificate root'; then
+if [[ -n "$NOTARIZED" ]]; then
+  # Notarized: Gatekeeper opens it as it is; it goes where the person drags it. (SIGN_IDENTITY=- is a dry run.)
+  [[ "$SIGN_IDENTITY" == "-" ]] || xcrun stapler validate "$STAGE/SAVISUL.app"
+  ln -s /Applications "$STAGE/Applications"
+elif ! codesign -dr - "$STAGE/SAVISUL.app" 2>&1 | grep -q 'certificate root'; then
   echo "SAVISUL.app is not signed with the SAVISUL certificate; run scripts/signing.sh first." >&2
   exit 1
 fi
+if [[ -z "$NOTARIZED" ]]; then
 # macOS 26 refuses a downloaded app and shows no "Open Anyway" button.
 # The same steps pasted into Terminal are not checked by Gatekeeper.
 cp scripts/open-savisul.zsh "$STAGE/Установить SAVISUL.command"
@@ -49,10 +61,11 @@ chmod +x "$STAGE/Установить SAVISUL.command"
   sed '1d' scripts/open-savisul.zsh
   print -r -- "SAVISUL"
 } > "$STAGE/Если не открывается.txt"
-cp "$BACKGROUND" "$STAGE/.background/background.png"
 swiftc -O -framework AppKit -sdk "$PWD/.build/MacOSX.sdk" -vfsoverlay "$PWD/.build/overlay.json" \
   -module-cache-path "$PWD/.build/module-cache" -o "$PWD/.build/dmg-icons" scripts/dmg_icons.swift
 "$PWD/.build/dmg-icons" "$STAGE/Установить SAVISUL.command" "$STAGE/Если не открывается.txt"
+fi
+cp "$BACKGROUND" "$STAGE/.background/background.png"
 cp "$APP/Contents/Resources/AppIcon.icns" "$STAGE/.VolumeIcon.icns"
 
 if [[ -d "$MOUNT" ]]; then
@@ -65,9 +78,17 @@ hdiutil attach -readwrite -noverify -noautoopen -mountpoint "$MOUNT" "$RW" >/dev
 cp -R "$STAGE"/. "$MOUNT"/
 chflags hidden "$MOUNT/.background" "$MOUNT/.VolumeIcon.icns"
 # The helper files show without their extensions, so the row reads SAVISUL, Установить SAVISUL, Если не открывается.
-/Library/Developer/CommandLineTools/usr/bin/SetFile -a E "$MOUNT/Установить SAVISUL.command"
-/Library/Developer/CommandLineTools/usr/bin/SetFile -a E "$MOUNT/Если не открывается.txt"
+if [[ -z "$NOTARIZED" ]]; then
+  /Library/Developer/CommandLineTools/usr/bin/SetFile -a E "$MOUNT/Установить SAVISUL.command"
+  /Library/Developer/CommandLineTools/usr/bin/SetFile -a E "$MOUNT/Если не открывается.txt"
+fi
 /Library/Developer/CommandLineTools/usr/bin/SetFile -a C "$MOUNT"
+if [[ -n "$NOTARIZED" ]]; then
+  ROW=('set position of item "SAVISUL.app" of theWindow to {180, 206}' 'set position of item "Applications" of theWindow to {540, 206}')
+else
+  ROW=('set position of item "SAVISUL.app" of theWindow to {180, 206}' 'set position of item "Установить SAVISUL.command" of theWindow to {360, 206}'
+       'set position of item "Если не открывается.txt" of theWindow to {540, 206}')
+fi
 
 osascript << EOF
 tell application "Finder"
@@ -84,9 +105,7 @@ tell application "Finder"
     set icon size of theOptions to 96
     set text size of theOptions to 12
     set background picture of theOptions to file ".background:background.png"
-    set position of item "SAVISUL.app" of theWindow to {180, 206}
-    set position of item "Установить SAVISUL.command" of theWindow to {360, 206}
-    set position of item "Если не открывается.txt" of theWindow to {540, 206}
+    ${(F)ROW}
     update without registering applications
     delay 1
     close
@@ -104,6 +123,25 @@ hdiutil detach "$MOUNT" >/dev/null
 hdiutil convert "$RW" -format UDZO -imagekey zlib-level=9 -o "$DMG" >/dev/null
 rm -f "$RW"
 rmdir "$RW_DIR"
+
+if [[ -n "$NOTARIZED" ]]; then
+  # The image is signed, notarized and stapled as well, so even opening it raises no question.
+  if [[ "$SIGN_IDENTITY" == "-" ]]; then
+    codesign --force --sign - "$DMG"
+  else
+    codesign --force --timestamp --sign "$SIGN_IDENTITY" "$DMG"
+    notarize "$DMG"
+    xcrun stapler staple "$DMG"
+    spctl --assess --type open --context context:primary-signature -v "$DMG"
+  fi
+  ZIP="$PWD/dist/SAVISUL-$VERSION.zip"
+  rm -f "$ZIP"
+  ditto -c -k --norsrc --keepParent "$STAGE/SAVISUL.app" "$ZIP"
+  echo "Installer: $DMG"
+  echo "Zip: $ZIP"
+  du -h "$DMG" "$ZIP"
+  exit 0
+fi
 
 # A zip made this way keeps the executable bit. Packing the folder in Telegram does not,
 # and macOS then reports that the app can't be opened.

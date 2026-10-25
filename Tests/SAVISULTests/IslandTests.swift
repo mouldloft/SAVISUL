@@ -156,3 +156,19 @@ private let start = Date(timeIntervalSinceReferenceDate: 1_000)
     #expect(CallTabs.isCallPage("https://telemost.yandex.ru/j/123"))
     #expect(!CallTabs.isCallPage("https://www.google.com/search?q=meet"))
 }
+
+struct PandaVoiceTests {
+    /// Every mood but typing along has a sound, and each one ships in Resources/Panda.
+    @Test func everyMoodThatSpeaksHasItsSound() throws {
+        let folder = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+            .appendingPathComponent("Resources/Panda")
+        let moods: [PandaMood] = [.done, .ask, .limit, .working, .hello, .alarm, .sleepy, .dance]
+        let names = moods.compactMap(PandaVoice.resource(for:))
+        #expect(names.count == moods.count - 1)
+        #expect(PandaVoice.resource(for: .working) == nil)
+        #expect(Set(names).count == names.count)
+        for name in names {
+            #expect(FileManager.default.fileExists(atPath: folder.appendingPathComponent("\(name).m4a").path), "\(name).m4a")
+        }
+    }
+}

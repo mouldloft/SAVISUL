@@ -170,6 +170,12 @@ final class IslandController {
 
     private func entered() {
         leaveTask?.cancel()
+        // Over a notice with buttons the island stays as it is, and the notice waits, so Allow or Open can be clicked.
+        // Opening the whole island here used to replace the buttons the pointer was heading for.
+        if model.noticeHasButtons {
+            model.holdNotice(true)
+            return
+        }
         guard model.mode != .expanded, suite.settings.islandHover else { return }
         let task = DispatchWorkItem { [weak self] in
             MainActor.assumeIsolated {
@@ -184,6 +190,7 @@ final class IslandController {
 
     private func exited() {
         hoverTask?.cancel()
+        if model.noticeHasButtons { model.holdNotice(false) }
         guard model.mode == .expanded, !model.dragNearby else { return }
         let task = DispatchWorkItem { [weak self] in
             MainActor.assumeIsolated {

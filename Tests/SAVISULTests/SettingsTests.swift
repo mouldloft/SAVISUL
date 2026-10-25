@@ -25,6 +25,7 @@ final class SettingsTests {
         let settings = SuiteSettings()
         #expect(settings.island)
         #expect(!settings.mixer)
+        #expect(settings.assistant && settings.assistantHotkey)
         #expect(settings.clipboardLimit == 1000)
         #expect(settings.favorites == SuiteSettings.defaultFavorites)
         #expect(abs(settings.headphoneLevel - 0.25) < 0.001)

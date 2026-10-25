@@ -30,7 +30,14 @@ struct FeatureGroup: Identifiable {
         return (on, 1 + options.count)
     }
 
-    @MainActor static let all: [FeatureGroup] = [
+    #if MOULD_ENGINE
+    /// The assistant comes with Mould Engine, in builds that include it.
+    @MainActor static let engine: [FeatureGroup] = [MindFeatures.group]
+    #else
+    @MainActor static let engine: [FeatureGroup] = []
+    #endif
+
+    @MainActor static let all: [FeatureGroup] = engine + [
         FeatureGroup(
             id: "island", symbol: "capsule.inset.filled", title: Phrase("Island", ru: "Островок", uk: "Острівець", fr: "Îlot"),
             detail: Phrase("Music, meetings, timers, files and agents around the camera.", ru: "Музыка, встречи, таймеры, файлы и агенты вокруг камеры.",
@@ -54,6 +61,12 @@ struct FeatureGroup: Identifiable {
                 FeatureItem(id: "islandAgents", key: \.islandAgents, title: Phrase("AI agents", ru: "ИИ-агенты", uk: "ШІ-агенти", fr: "Agents IA"),
                             detail: Phrase("Claude Code, Codex, Cursor, OpenCode, Copilot", ru: "Claude Code, Codex, Cursor, OpenCode, Copilot",
                                            uk: "Claude Code, Codex, Cursor, OpenCode, Copilot", fr: "Claude Code, Codex, Cursor, OpenCode, Copilot")),
+                FeatureItem(id: "agentApprovals", key: \.agentApprovals, title: Phrase("Answer Claude Code in the island", ru: "Ответы Claude Code в островке",
+                                                                                 uk: "Відповіді Claude Code в острівці", fr: "Répondre à Claude Code dans l’îlot"),
+                            detail: Phrase("Adds a hook to Claude Code's settings: when it asks before running something, the panda brings the question with Allow and Deny",
+                                           ru: "Добавляет хук в настройки Claude Code: когда он спрашивает разрешение, Панда приносит вопрос с кнопками «Разрешить» и «Отклонить»",
+                                           uk: "Додає хук у налаштування Claude Code: коли він питає дозвіл, Панда приносить питання з кнопками «Дозволити» й «Відхилити»",
+                                           fr: "Ajoute un hook aux réglages de Claude Code : quand il demande la permission, le panda apporte la question avec Autoriser et Refuser")),
                 FeatureItem(id: "islandCamera", key: \.islandCamera, title: Phrase("Camera mirror", ru: "Зеркало камеры", uk: "Дзеркало камери", fr: "Miroir de caméra")),
                 FeatureItem(id: "islandNotices", key: \.islandNotices, title: Phrase("Notices", ru: "Уведомления", uk: "Сповіщення", fr: "Notifications")),
                 FeatureItem(id: "islandPower", key: \.islandPower, title: Phrase("Charger and battery", ru: "Зарядка и батарея", uk: "Заряджання й батарея", fr: "Charge et batterie")),
@@ -62,6 +75,25 @@ struct FeatureGroup: Identifiable {
                             detail: Phrase("Shows the level when it changes", ru: "Показывает уровень, когда он меняется",
                                            uk: "Показує рівень, коли він змінюється", fr: "Affiche le niveau quand il change")),
                 FeatureItem(id: "islandHaptics", key: \.islandHaptics, title: Phrase("Haptic feedback", ru: "Тактильный отклик", uk: "Тактильний відгук", fr: "Retour haptique"))
+            ]),
+        // The panda has a group of its own, so anyone it bothers finds the switch at once; its ids stay the same for automations.
+        FeatureGroup(
+            id: "panda", symbol: "pawprint.fill", title: Phrase("Panda", ru: "Панда", uk: "Панда", fr: "Panda"),
+            detail: Phrase("The island's companion. Turned off, the island shows the same news without it.",
+                           ru: "Спутник островка. Если её выключить, островок покажет те же новости без неё.",
+                           uk: "Супутниця острівця. Якщо її вимкнути, острівець покаже ті самі новини без неї.",
+                           fr: "Le compagnon de l’îlot. Désactivé, l’îlot affiche les mêmes nouvelles sans lui."),
+            main: FeatureItem(id: "islandPanda", key: \.islandPanda, title: Phrase("Show the panda", ru: "Показывать панду", uk: "Показувати панду", fr: "Afficher le panda"),
+                              detail: Phrase("Runs into the island when an agent is done, and types along while it works",
+                                             ru: "Прибегает в островок, когда агент закончил, и печатает вместе с ним, пока он работает",
+                                             uk: "Прибігає в острівець, коли агент закінчив, і друкує разом із ним, поки він працює",
+                                             fr: "Arrive dans l’îlot quand un agent a fini, et tape avec lui pendant qu’il travaille")),
+            options: [
+                FeatureItem(id: "pandaSounds", key: \.pandaSounds, title: Phrase("Panda sounds", ru: "Звуки панды", uk: "Звуки панди", fr: "Sons du panda"),
+                            detail: Phrase("A happy squeak with good news, a curious hum when it asks, a yawn when it gets sleepy",
+                                           ru: "Радостный писк с хорошей новостью, любопытное «хм?», когда спрашивает, и зевок, когда хочет спать",
+                                           uk: "Радісний писк із доброю новиною, допитливе «хм?», коли питає, і позіхання, коли хоче спати",
+                                           fr: "Un petit cri joyeux pour une bonne nouvelle, un « hm ? » curieux quand il demande, un bâillement quand il a sommeil"))
             ]),
         FeatureGroup(
             id: "sound", symbol: "speaker.wave.3.fill", title: Phrase("Sound", ru: "Звук", uk: "Звук", fr: "Son"),

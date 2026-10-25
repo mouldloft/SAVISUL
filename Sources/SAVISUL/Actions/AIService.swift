@@ -73,7 +73,7 @@ final class AIService {
     var ready: Bool { hasKey && !model.trimmingCharacters(in: .whitespaces).isEmpty }
 
     @ObservationIgnored private let defaults = UserDefaults.standard
-    private static let service = "com.savisul.ai"
+    nonisolated private static let service = "com.savisul.ai"
     static let openAIBase = "https://api.openai.com/v1"
 
     private init() {
@@ -97,7 +97,9 @@ final class AIService {
     func setKey(_ key: String) {
         let trimmed = key.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
-        removeKey()
+        // The old key goes first, without a check of its own: one check, after the new key is in, says how it ended.
+        SecItemDelete([kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: Self.service,
+                       kSecAttrAccount as String: provider.rawValue] as CFDictionary)
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: Self.service,
             kSecAttrAccount as String: provider.rawValue, kSecValueData as String: Data(trimmed.utf8),
@@ -114,6 +116,16 @@ final class AIService {
         refreshKey()
     }
 
+    /// A provider's key, read straight from the Keychain on any thread, for the assistant's engine.
+    nonisolated static func storedKey(for provider: Provider) -> String? {
+        let query: [String: Any] = [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: service,
+                                    kSecAttrAccount as String: provider.rawValue, kSecReturnData as String: true,
+                                    kSecMatchLimit as String: kSecMatchLimitOne]
+        var result: AnyObject?
+        guard SecItemCopyMatching(query as CFDictionary, &result) == errSecSuccess, let data = result as? Data else { return nil }
+        return String(data: data, encoding: .utf8)
+    }
+
     private func key() -> String? {
         let query: [String: Any] = [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: Self.service,
                                     kSecAttrAccount as String: provider.rawValue, kSecReturnData as String: true,
@@ -123,10 +135,19 @@ final class AIService {
         return String(data: data, encoding: .utf8)
     }
 
+    /// Whether the provider has a key, asked away from the main thread: the keychain is a round trip to another process,
+    /// and macOS flags the call when the interface waits on it.
     private func refreshKey() {
-        let query: [String: Any] = [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: Self.service,
-                                    kSecAttrAccount as String: provider.rawValue]
-        hasKey = SecItemCopyMatching(query as CFDictionary, nil) == errSecSuccess
+        let service = Self.service, account = provider.rawValue
+        Task.detached(priority: .userInitiated) { [weak self] in
+            let query: [String: Any] = [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: service,
+                                        kSecAttrAccount as String: account]
+            let found = SecItemCopyMatching(query as CFDictionary, nil) == errSecSuccess
+            await MainActor.run {
+                // Only for the provider still chosen.
+                if let self, self.provider.rawValue == account { self.hasKey = found }
+            }
+        }
     }
 
     // MARK: Asking

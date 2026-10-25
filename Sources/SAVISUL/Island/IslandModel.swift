@@ -43,6 +43,15 @@ struct IslandNotice: Identifiable {
     var duration: Double = 3.4
     var actionTitle: String?
     var action: (@MainActor () -> Void)?
+    /// The panda, instead of the symbol, for what agents do.
+    var mascot: PandaMood?
+    /// A second, quieter button beside the first, like Deny beside Allow.
+    var secondTitle: String?
+    var second: (@MainActor () -> Void)?
+    /// A question that can't wait in line: it shows at once, even over the open island.
+    var urgent = false
+    /// Runs when the notice goes away, answered or not.
+    var dismissed: (@MainActor () -> Void)?
 }
 
 /// A level that changes in place while it moves, like the volume, and goes away a moment after.
@@ -98,6 +107,16 @@ final class IslandModel {
 
     func post(_ notice: IslandNotice) {
         if let current = self.notice, current.title == notice.title, current.detail == notice.detail { return }
+        if notice.urgent, let current = self.notice {
+            // A question goes first; whatever it interrupts comes back after it. Two questions take turns.
+            if current.urgent {
+                queue.insert(notice, at: 0)
+            } else {
+                queue.insert(current, at: 0)
+                show(notice)
+            }
+            return
+        }
         if self.notice != nil, notice.level == nil {
             queue.append(notice)
             if queue.count > 3 { queue.removeFirst() }
@@ -110,16 +129,31 @@ final class IslandModel {
         noticeTask?.cancel()
         withAnimation(.islandSpring) {
             self.notice = notice
-            if mode == .collapsed { mode = .peek }
+            if mode == .collapsed || (notice.urgent && mode == .expanded) { mode = .peek }
         }
         onModeChange?()
+        if let mood = notice.mascot { PandaVoice.speak(mood) }
         let task = DispatchWorkItem { [weak self] in MainActor.assumeIsolated { self?.dismissNotice() } }
         noticeTask = task
         DispatchQueue.main.asyncAfter(deadline: .now() + notice.duration, execute: task)
     }
 
+    /// The pointer is on the notice: it stays while the pointer is there, and goes a little after it leaves.
+    func holdNotice(_ held: Bool) {
+        guard notice != nil else { return }
+        noticeTask?.cancel()
+        guard !held else { return }
+        let task = DispatchWorkItem { [weak self] in MainActor.assumeIsolated { self?.dismissNotice() } }
+        noticeTask = task
+        DispatchQueue.main.asyncAfter(deadline: .now() + (notice?.urgent == true ? 60 : 2.5), execute: task)
+    }
+
+    /// A notice with buttons is open for clicking; the pointer on it must not open the whole island over it.
+    var noticeHasButtons: Bool { mode == .peek && hud == nil && notice?.action != nil }
+
     func dismissNotice() {
         noticeTask?.cancel()
+        notice?.dismissed?()
         if !queue.isEmpty {
             show(queue.removeFirst())
             return

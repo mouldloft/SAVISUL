@@ -19,9 +19,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.4</string>
+	<string>2.9.2</string>
 	<key>CFBundleVersion</key>
-	<string>13</string>
+	<string>27</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
@@ -29,9 +29,11 @@
 	<key>LSUIElement</key>
 	<false/>
 	<key>NSAppleEventsUsageDescription</key>
-	<string>SAVISUL asks macOS for an administrator password when you turn closed-lid mode on or off, asks Finder which folder is open when you paste an image there, and brings up your call's tab in the browser when you use the island's call buttons.</string>
+	<string>SAVISUL asks macOS for an administrator password when you turn closed-lid mode on or off, asks Finder which folder is open when you paste an image there, brings up your call's tab in the browser when you use the island's call buttons, and reads the address of the page you're on when you bring it to the assistant.</string>
 	<key>NSAudioCaptureUsageDescription</key>
 	<string>SAVISUL routes the sound of each app through its mixer so you can set a separate volume, boost it past 100 percent, send it to another output and see the equalizer.</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>SAVISUL tells your own iPhone, over Bluetooth, that it is right beside this Mac, so SAVISUL Mobile can throw a link or a picture onto its screen.</string>
 	<key>NSCalendarsFullAccessUsageDescription</key>
 	<string>SAVISUL shows your next meetings in the notch and reminds you five minutes before they start.</string>
 	<key>NSCalendarsUsageDescription</key>
@@ -46,6 +48,8 @@
 	<string>SAVISUL shows download progress and finished files in the notch.</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>SAVISUL looks through your Photos library on this Mac, so the assistant can find a picture by what is in it. Nothing leaves the Mac.</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>NSRemovableVolumesUsageDescription</key>

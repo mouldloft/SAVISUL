@@ -17,6 +17,9 @@ final class SuiteSettings {
     var islandTimers: Bool { didSet { put(islandTimers, "islandTimers") } }
     var islandDownloads: Bool { didSet { put(islandDownloads, "islandDownloads") } }
     var islandAgents: Bool { didSet { put(islandAgents, "islandAgents") } }
+    var islandPanda: Bool { didSet { put(islandPanda, "islandPanda") } }
+    var pandaSounds: Bool { didSet { put(pandaSounds, "pandaSounds") } }
+    var agentApprovals: Bool { didSet { put(agentApprovals, "agentApprovals") } }
     var islandCamera: Bool { didSet { put(islandCamera, "islandCamera") } }
     var islandShelf: Bool { didSet { put(islandShelf, "islandShelf") } }
     var islandNotices: Bool { didSet { put(islandNotices, "islandNotices") } }
@@ -73,6 +76,10 @@ final class SuiteSettings {
     var agentChime: Bool { didSet { put(agentChime, "agentChime") } }
     var agentMinimumMinutes: Double { didSet { put(agentMinimumMinutes, "agentMinimumMinutes") } }
 
+    // Assistant (Mould Engine)
+    var assistant: Bool { didSet { put(assistant, "assistant") } }
+    var assistantHotkey: Bool { didSet { put(assistantHotkey, "assistantHotkey") } }
+
     // Face Unlock
     var faceUnlock: Bool { didSet { put(faceUnlock, "faceUnlock") } }
     var faceUnlockBlink: Bool { didSet { put(faceUnlockBlink, "faceUnlockBlink") } }
@@ -93,6 +100,9 @@ final class SuiteSettings {
         islandTimers = Self.read("islandTimers", true)
         islandDownloads = Self.read("islandDownloads", true)
         islandAgents = Self.read("islandAgents", true)
+        islandPanda = Self.read("islandPanda", true)
+        pandaSounds = Self.read("pandaSounds", true)
+        agentApprovals = Self.read("agentApprovals", false)
         islandCamera = Self.read("islandCamera", true)
         islandShelf = Self.read("islandShelf", true)
         islandNotices = Self.read("islandNotices", true)
@@ -143,6 +153,9 @@ final class SuiteSettings {
 
         agentChime = Self.read("agentChime", true)
         agentMinimumMinutes = Self.read("agentMinimumMinutes", 1)
+
+        assistant = Self.read("assistant", true)
+        assistantHotkey = Self.read("assistantHotkey", true)
 
         faceUnlock = Self.read("faceUnlock", false)
         faceUnlockBlink = Self.read("faceUnlockBlink", false)

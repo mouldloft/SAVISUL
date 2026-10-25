@@ -146,7 +146,7 @@ final class SakuraScene: SKScene {
 
     private func place(_ petal: inout Petal, scattered: Bool) {
         let art = self.art
-        let fromTree = SakuraArt.painting(art.resource) != nil && Double.random(in: 0...1) < 0.55
+        let fromTree = !painting.isHidden && Double.random(in: 0...1) < 0.55
         if fromTree, let pad = art.canopy.randomElement() {
             let angle = CGFloat.random(in: 0...(2 * .pi))
             let radius = sqrt(CGFloat.random(in: 0...1))
@@ -384,15 +384,17 @@ enum SakuraArt {
         return preview
     }
 
-    @MainActor private static var loaded: (name: String, texture: SKTexture, size: CGSize)?
+    @MainActor private static var loaded: [String: (texture: SKTexture, size: CGSize)] = [:]
 
-    /// The painting for a landscape, from the app's resources. Only the one in use stays in memory.
+    /// The painting for a landscape. The panel's and the desktop's are different paintings of the same scene, so two are
+    /// kept: with only one, a wallpaper playing in both places decoded a 4K picture again for nearly every new petal.
     @MainActor static func painting(_ name: String) -> (texture: SKTexture, size: CGSize)? {
-        if let loaded, loaded.name == name { return (loaded.texture, loaded.size) }
+        if let cached = loaded[name] { return cached }
         guard let url = location(name), let image = NSImage(contentsOf: url) else { return nil }
-        let texture = SKTexture(image: image)
-        loaded = (name, texture, image.size)
-        return (texture, image.size)
+        if loaded.count >= 2 { loaded.removeAll() }
+        let painting = (texture: SKTexture(image: image), size: image.size)
+        loaded[name] = painting
+        return painting
     }
 
     @MainActor static let petals: [SKTexture] = [

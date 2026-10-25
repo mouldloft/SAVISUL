@@ -16,8 +16,17 @@ enum SAVISULMain {
             MainActor.assumeIsolated { SelfCheck.run() }
             return
         }
+        if arguments.contains("--agent-hook") {
+            AgentHook.run()
+            return
+        }
         if arguments.contains("--agent-report") {
             AgentReport.print()
+            return
+        }
+        if let index = arguments.firstIndex(of: "--agent-watch") {
+            let seconds = arguments.dropFirst(index + 1).first.flatMap(Double.init) ?? 300
+            AgentReport.watch(seconds: seconds)
             return
         }
         if let index = arguments.firstIndex(of: "--render-icon"), index + 1 < arguments.count {
@@ -60,6 +69,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillFinishLaunching(_ notification: Notification) {
         launchedAtLogin = LaunchContext.isLoginLaunch()
+        WhatsNew.noteLaunch()
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -74,6 +84,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         controller.start(showPanel: !launchedAtLogin && !background)
         LiveWallpaper.shared.start()
         Updater.shared.start()
+        WhatsNew.shared.launched()
         SingleInstance.listen { [weak controller] in controller?.show() }
         let bridge = BridgeServer(model: model)
         bridge.onOpen = { [weak controller] in controller?.show() }

@@ -11,7 +11,14 @@ import SwiftUI
 final class Suite {
     static let shared = Suite()
 
-    var language: Language = .en
+    var language: Language = .en {
+        didSet {
+            #if MOULD_ENGINE
+            // The assistant answers in the app's language.
+            if language != oldValue { MindHost.shared.languageChanged() }
+            #endif
+        }
+    }
     let settings = SuiteSettings()
     let island = IslandModel()
     let nowPlaying = NowPlaying()
@@ -21,6 +28,7 @@ final class Suite {
     let downloads = DownloadWatcher()
     let camera = CameraMirror()
     let agents = AgentMonitor()
+    let approvals = AgentApprovals()
     let calls = CallMonitor()
     let launcher = AgentLauncher()
     let shelf = ShelfStore()
@@ -141,6 +149,9 @@ final class Suite {
         mixer.stop()
         sound.shutdown()
         windows.shutdown()
+        #if MOULD_ENGINE
+        MindHost.shared.stop()
+        #endif
     }
 
     /// Window, Finder and switcher features act on other apps and need Accessibility.
@@ -193,7 +204,8 @@ final class Suite {
         if s.island && s.islandMusic { nowPlaying.start() } else { nowPlaying.stop() }
         if s.island && s.islandCalendar { calendar.start() } else { calendar.stop() }
         if s.island && s.islandDownloads { downloads.start() } else { downloads.stop() }
-        if s.island && s.islandAgents { agents.start() } else { agents.stop() }
+        if s.island && s.islandAgents { agents.start(); approvals.start() } else { agents.stop() }
+        ClaudeHooks.sync(enabled: s.island && s.islandAgents && s.agentApprovals)
         if s.island && s.islandCalls { calls.start() } else { calls.stop() }
         if s.mixer { mixer.start() } else { mixer.stop() }
         bind("sound.output", s.outputHotkey, .control(kVK_ANSI_O)) { Suite.shared.sound.cycleOutput() }
@@ -202,6 +214,9 @@ final class Suite {
         clipboard.apply(s)
         commands.apply(s)
         faceUnlock.apply(s.faceUnlock)
+        #if MOULD_ENGINE
+        applyAssistant(s)
+        #endif
     }
 
     /// Expands the island on a tab, turning the island on first if needed.
@@ -260,16 +275,24 @@ final class Suite {
             self.automations.agentFinished(finish)
             let title = finish.limitHit ? Phrases.agentLimit(finish.kind.short) : Phrases.agentDone(finish.kind.short)
             let detail = [finish.project, Say.duration(finish.duration)].compactMap { $0 }.joined(separator: " · ")
-            self.notify(IslandNotice(symbol: finish.limitHit ? "exclamationmark.octagon.fill" : "checkmark.seal.fill",
-                                     tint: finish.limitHit ? Palette.danger : finish.kind.tint, title: title, detail: detail,
-                                     style: finish.limitHit ? .warning : .success, duration: 6))
-            if self.settings.agentChime { NSSound(named: NSSound.Name(finish.limitHit ? "Basso" : "Hero"))?.play() }
+            var notice = IslandNotice(symbol: finish.limitHit ? "exclamationmark.octagon.fill" : "checkmark.seal.fill",
+                                      tint: finish.limitHit ? Palette.danger : finish.kind.tint, title: title, detail: detail,
+                                      style: finish.limitHit ? .warning : .success, duration: 6)
+            // The panda runs in with the news: pleased when the work is done, slumped when a limit stopped it.
+            if self.settings.islandPanda { notice.mascot = finish.limitHit ? .limit : .done }
+            self.notify(notice)
+            // With its sounds on, the panda says it itself; the chime would only talk over it.
+            if self.settings.agentChime && !(notice.mascot != nil && self.noticesShow && PandaVoice.speaks) {
+                NSSound(named: NSSound.Name(finish.limitHit ? "Basso" : "Hero"))?.play()
+            }
         }
         agents.onStart = { [weak self] status in
             guard let self else { return }
             let detail = [status.project, status.model].compactMap { $0 }.joined(separator: " · ")
-            self.notify(IslandNotice(symbol: status.kind.symbol, tint: status.kind.tint, title: Phrases.agentWorking(status.kind.short),
-                                     detail: detail.isEmpty ? nil : detail, duration: 2.8))
+            var notice = IslandNotice(symbol: status.kind.symbol, tint: status.kind.tint, title: Phrases.agentWorking(status.kind.short),
+                                      detail: detail.isEmpty ? nil : detail, duration: 2.8)
+            if self.settings.islandPanda { notice.mascot = .working }
+            self.notify(notice)
         }
         calls.onStart = { [weak self] call in
             guard let self else { return }
@@ -420,7 +443,50 @@ final class Suite {
     }
 
     /// Posts to the island when it is on, otherwise to the SAVISUL panel toast.
+    static func pandaMood(for notice: IslandNotice) -> PandaMood {
+        if notice.symbol.hasPrefix("battery.0") || notice.symbol.hasPrefix("battery.25") { return .sleepy }
+        if notice.symbol == "timer" { return .alarm }
+        switch notice.style {
+        case .success: return .done
+        case .alert: return .alarm
+        case .warning: return .limit
+        case .info: return .hello
+        }
+    }
+
+    /// Claude Code asks before it runs something: the panda brings the question, with Allow and Deny.
+    func agentAsks(id: String, tool: String, summary: String, project: String) {
+        let detail = [summary, project].filter { !$0.isEmpty }.joined(separator: " · ")
+        var notice = IslandNotice(symbol: "hand.raised.fill", tint: AgentKind.claude.tint, title: PandaPhrases.asks(tool),
+                                  detail: detail.isEmpty ? nil : detail, style: .alert, duration: 100,
+                                  actionTitle: PandaPhrases.allow.text, action: { [weak self] in self?.approvals.reply(id, "allow") })
+        notice.secondTitle = PandaPhrases.deny.text
+        notice.second = { [weak self] in self?.approvals.reply(id, "deny") }
+        // Gone without an answer, the question goes back to the terminal at once instead of waiting out the clock.
+        notice.dismissed = { [weak self] in self?.approvals.reply(id, "ask") }
+        notice.mascot = settings.islandPanda ? .ask : nil
+        notice.urgent = true
+        notify(notice)
+        if settings.agentChime && !(notice.mascot != nil && noticesShow && PandaVoice.speaks) { NSSound(named: NSSound.Name("Glass"))?.play() }
+    }
+
+    /// Claude Code waits for the person. Its permission prompts come through agentAsks, with buttons, instead.
+    func agentNeedsYou(message: String, project: String) {
+        guard !message.localizedCaseInsensitiveContains("permission") else { return }
+        let detail = [message, project].filter { !$0.isEmpty }.joined(separator: " · ")
+        var notice = IslandNotice(symbol: "bubble.left.fill", tint: AgentKind.claude.tint, title: PandaPhrases.waiting.text,
+                                  detail: detail.isEmpty ? nil : detail, duration: 7)
+        notice.mascot = settings.islandPanda ? .ask : nil
+        notify(notice)
+    }
+
+    /// Notices reach the island at all.
+    var noticesShow: Bool { settings.island && settings.islandNotices }
+
     func notify(_ notice: IslandNotice) {
+        var notice = notice
+        // The panda comes with most news, in the mood that fits it; levels like the volume stay plain.
+        if settings.islandPanda, notice.mascot == nil, notice.level == nil { notice.mascot = Self.pandaMood(for: notice) }
         if settings.island && settings.islandNotices {
             island.post(notice)
             if settings.islandHaptics { NSHapticFeedbackManager.defaultPerformer.perform(.alignment, performanceTime: .now) }

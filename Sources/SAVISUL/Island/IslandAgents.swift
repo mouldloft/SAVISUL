@@ -33,9 +33,10 @@ struct IslandAgents: View {
                         ForEach(Array(stride(from: 0, to: shown.count, by: 2)), id: \.self) { row in
                             GridRow {
                                 ForEach(shown[row..<min(row + 2, shown.count)]) { agent in
-                                    let launchable = launcher.targets.contains { $0.kind == agent.kind }
+                                    // Studio has its own chat: its card opens Studio on the project, the others start a task here.
+                                    let launchable = agent.kind == .mould || launcher.targets.contains { $0.kind == agent.kind }
                                     AgentCard(agent: agent, launchable: launchable) {
-                                        launcher.begin(agent.kind, monitor: suite.agents)
+                                        if agent.kind == .mould { AgentLauncher.openStudio(agent.projectPath) } else { launcher.begin(agent.kind, monitor: suite.agents) }
                                     }
                                 }
                                 // An odd last card keeps its column width instead of stretching across.
@@ -385,7 +386,7 @@ private struct AgentCard: View {
                     }
                     TimelineView(.periodic(from: .now, by: 1)) { context in
                         Text(state(at: context.date)).font(.system(size: 10.5, weight: agent.working ? .semibold : .regular).monospacedDigit())
-                            .foregroundStyle(agent.limitHit ? Palette.danger : (agent.working ? Palette.positive : Palette.tertiary))
+                            .foregroundStyle(agent.limitHit ? Palette.danger : agent.waiting ? Palette.accent : (agent.working ? Palette.positive : Palette.tertiary))
                             .lineLimit(1)
                     }
                 }
@@ -427,7 +428,8 @@ private struct AgentCard: View {
         .contentShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
         .onHover { inside in withAnimation(.islandQuick) { hover = inside } }
         .onTapGesture { if launchable { start() } }
-        .help(launchable ? AgentPhrases.newTask.text : "")
+        .help(agent.kind == .mould ? Phrase("Open in Mould Engine Studio", ru: "Открыть в Mould Engine Studio", uk: "Відкрити в Mould Engine Studio",
+                                            fr: "Ouvrir dans Mould Engine Studio").text : launchable ? AgentPhrases.newTask.text : "")
     }
 
     private func footer(limits count: Int) -> some View {
@@ -451,6 +453,9 @@ private struct AgentCard: View {
             }
             return Phrase("Usage limit reached", ru: "Лимит исчерпан", uk: "Ліміт вичерпано", fr: "Limite atteinte").text
         }
+        if agent.waiting {
+            return Phrase("Waiting for your answer", ru: "Ждёт вашего ответа", uk: "Чекає на вашу відповідь", fr: "Attend votre réponse").text
+        }
         if agent.working {
             let time = agent.since.map { Say.clock(date.timeIntervalSince($0)) } ?? ""
             let runs = agent.runs > 1 ? " · ×\(agent.runs)" : ""
@@ -470,6 +475,8 @@ private struct AgentCard: View {
     private var detail: String? {
         var parts: [String] = []
         if let project = agent.project { parts.append(project) }
+        // A question waiting says what it asks, before anything else.
+        if agent.waiting, let question = agent.question { return question }
         if let model = agent.model { parts.append(model) }
         if agent.working, let task = agent.task { parts.append("«\(task)»") }
         return parts.isEmpty ? nil : parts.joined(separator: " · ")

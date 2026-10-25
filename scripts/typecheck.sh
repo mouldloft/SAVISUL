@@ -7,4 +7,5 @@ swiftc -typecheck -parse-as-library \
   -vfsoverlay "$PWD/.build/overlay.json" \
   -module-cache-path "$PWD/.build/module-cache" \
   -I Sources/SMCBridge/include \
+  $([[ -d MouldEngine/.build/clt/release ]] && print -- "-D MOULD_ENGINE -I $PWD/MouldEngine/.build/clt/release") \
   Sources/SAVISUL/**/*.swift 2>&1 | grep -E '^Sources.*error:' -A4 | head -${1:-120}

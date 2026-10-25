@@ -138,9 +138,15 @@ final class AppModel {
         RunLoop.main.add(timer, forMode: .common)
         self.timer = timer
         if !preview { Suite.shared.start(app: self) }
+        #if SAVISUL_CLOUD
+        if !preview { CloudService.shared.start(model: self) }
+        #endif
     }
 
     func shutdown() {
+        #if SAVISUL_CLOUD
+        CloudService.shared.shutdown()
+        #endif
         fans.shutdown()
         activity.save(synchronously: true)
         if capture.isRecording { capture.stopRecording() }

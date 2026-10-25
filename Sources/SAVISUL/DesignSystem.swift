@@ -164,9 +164,10 @@ struct PillButton: View {
 struct Spinner: View {
     var size: CGFloat = 14
     var color: Color = Palette.ink
+    @Environment(\.motionPaused) private var motionPaused
 
     var body: some View {
-        TimelineView(.animation) { context in
+        TimelineView(.animation(minimumInterval: 1.0 / 30, paused: motionPaused)) { context in
             let turn = context.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 0.9) / 0.9
             Circle()
                 .trim(from: 0.12, to: 0.82)

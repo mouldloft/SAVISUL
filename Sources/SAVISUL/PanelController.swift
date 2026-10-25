@@ -383,6 +383,15 @@ final class PanelController: NSObject {
 
     // MARK: QA renders
 
+    /// The assistant's renders, in builds that include Mould Engine.
+    private static func dumpEngine(to folder: URL, completion: @escaping () -> Void) {
+        #if MOULD_ENGINE
+        MindRender.dump(to: folder, completion: completion)
+        #else
+        completion()
+        #endif
+    }
+
     func dumpPanels(to folder: URL) {
         try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         let panel = makePanel(backdrop: true)
@@ -402,7 +411,7 @@ final class PanelController: NSObject {
             guard index < shots.count else {
                 ClipboardPanel.dump(to: folder) {
                     IslandAgentsRender.dump(to: folder) {
-                        IslandHomeRender.dump(to: folder) { IslandStatesRender.dump(to: folder) { NSApp.terminate(nil) } }
+                        IslandHomeRender.dump(to: folder) { IslandStatesRender.dump(to: folder) { Self.dumpEngine(to: folder) { WhatsNewRender.dump(to: folder) { NSApp.terminate(nil) } } } }
                     }
                 }
                 return

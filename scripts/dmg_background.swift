@@ -2,10 +2,12 @@ import AppKit
 import CoreImage
 
 // The installer window's background, drawn at twice its size so it is sharp on Retina screens. The window is
-// 720 × 440 points; Finder puts the three icons on one row, centred at x 180, 360 and 540, 206 points from the top.
+// 720 × 440 points; Finder puts the icons on one row, centred at x 180, 360 and 540, 206 points from the top.
+// With "drag" (the notarized disk image) there are two: SAVISUL at 180 and Applications at 540, to drag it onto.
 let width: CGFloat = 720
 let height: CGFloat = 440
 let output = CommandLine.arguments.count > 1 ? CommandLine.arguments[1] : "background.png"
+let drag = CommandLine.arguments.count > 2 && CommandLine.arguments[2] == "drag"
 let champagne = NSColor(srgbRed: 0.9, green: 0.81, blue: 0.64, alpha: 1)
 
 guard let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: Int(width * 2), pixelsHigh: Int(height * 2), bitsPerSample: 8,
@@ -49,16 +51,17 @@ func serifItalic(_ size: CGFloat) -> NSFont {
 }
 
 line("SAVISUL", top: 44, font: NSFont.systemFont(ofSize: 30, weight: .heavy), color: NSColor.white.withAlphaComponent(0.96), kern: 3.2)
-line("установка в один шаг", top: 84, font: serifItalic(17), color: champagne)
+line(drag ? "перетащите в «Программы»" : "установка в один шаг", top: 84, font: serifItalic(17), color: champagne)
 
-// A fine arrow from the app to the installer, centred between their icons.
+// A fine arrow from the app to where it goes, centred between their icons.
 let y = height - 206
+let tip: CGFloat = drag ? 480 : 300
 let arrow = NSBezierPath()
 arrow.move(to: NSPoint(x: 240, y: y))
-arrow.line(to: NSPoint(x: 299, y: y))
-arrow.move(to: NSPoint(x: 292, y: y + 6))
-arrow.line(to: NSPoint(x: 300, y: y))
-arrow.line(to: NSPoint(x: 292, y: y - 6))
+arrow.line(to: NSPoint(x: tip - 1, y: y))
+arrow.move(to: NSPoint(x: tip - 8, y: y + 6))
+arrow.line(to: NSPoint(x: tip, y: y))
+arrow.line(to: NSPoint(x: tip - 8, y: y - 6))
 arrow.lineWidth = 1.4
 arrow.lineCapStyle = .round
 arrow.lineJoinStyle = .round

@@ -7,26 +7,103 @@ struct SettingsPane: View {
     var body: some View {
         VStack(spacing: 12) {
             LanguageCard(model: model)
+            #if SAVISUL_CLOUD
+            CloudCard(model: model)
+            #endif
             GeneralCard(model: model)
             WallpaperCard(model: model)
             UpdateCard()
             AICard()
+            #if MOULD_ENGINE
+            MindCard(suite: Suite.shared)
+            #endif
             PermissionsCard(model: model)
             AboutFooter(model: model)
         }
     }
 }
 
+/// Each language says hello in its own words; the glow slides to the one chosen, and the panda waves every switch.
 private struct LanguageCard: View {
     var model: AppModel
+    @Namespace private var glow
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            CardTitle(model.text(.language))
-            GlassSegmented(items: Language.allCases.map { SegmentItem(value: $0, title: $0.nativeName) },
-                           selection: model.language) { model.setLanguage($0) }
+            HStack(alignment: .center) {
+                CardTitle(model.text(.language))
+                Spacer(minLength: 8)
+                // Waves at every switch, unless the person turned the panda off.
+                if Suite.shared.settings.islandPanda {
+                    PandaView(mood: .hello, size: 40)
+                        .id(model.language)
+                        .frame(width: 40, height: 30)
+                }
+            }
+            LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
+                ForEach(Language.allCases) { language in
+                    LanguageTile(language: language, selected: model.language == language, glow: glow) {
+                        if model.language != language { PandaVoice.speak(.hello) }
+                        model.setLanguage(language)
+                    }
+                }
+            }
         }
         .card()
+        .animation(.panelSpring, value: model.language)
+    }
+}
+
+private struct LanguageTile: View {
+    let language: Language
+    let selected: Bool
+    let glow: Namespace.ID
+    let action: () -> Void
+    @State private var hover = false
+
+    var body: some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 3) {
+                Text(language.greeting)
+                    .font(.system(size: 19, weight: .semibold))
+                    .foregroundStyle(Palette.ink.opacity(selected ? 1 : 0.8))
+                Text(language.nativeName)
+                    .font(.system(size: 11.5, weight: .medium))
+                    .foregroundStyle(selected ? Palette.accent : Palette.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 11)
+            .background {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Color.white.opacity(hover ? 0.075 : 0.04))
+                    if selected {
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .fill(LinearGradient(colors: [Palette.accent.opacity(0.3), Palette.accent.opacity(0.07)],
+                                                 startPoint: .topLeading, endPoint: .bottomTrailing))
+                            .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(Palette.accent.opacity(0.75), lineWidth: 1.2))
+                            .shadow(color: Palette.accent.opacity(0.35), radius: 10)
+                            .matchedGeometryEffect(id: "language", in: glow)
+                    }
+                }
+            }
+            .overlay(alignment: .topTrailing) {
+                if selected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 14, weight: .semibold))
+                        .symbolRenderingMode(.palette)
+                        .foregroundStyle(Palette.onLight, Palette.accent)
+                        .padding(8)
+                        .transition(.scale(scale: 0.4).combined(with: .opacity))
+                }
+            }
+            .scaleEffect(hover && !selected ? 1.025 : 1)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .onHover { hover = $0 }
+        .animation(.quickSpring, value: hover)
+        .accessibilityLabel(language.nativeName)
     }
 }
 
@@ -226,6 +303,7 @@ private struct UpdateCard: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer(minLength: 10)
+                PillButton(title: WhatsNewPhrases.open.text, symbol: "gift") { WhatsNew.shared.show() }
                 if case .available = updater.state {
                     PillButton(title: UpdatePhrases.update.text, prominent: true) { updater.install() }
                 } else if !updater.busy {

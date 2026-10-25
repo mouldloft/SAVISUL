@@ -14,6 +14,16 @@ enum Language: String, CaseIterable, Identifiable {
         }
     }
 
+    /// How the language says hello, for the language picker.
+    var greeting: String {
+        switch self {
+        case .en: "Hello"
+        case .ru: "Привет"
+        case .uk: "Привіт"
+        case .fr: "Bonjour"
+        }
+    }
+
     var locale: Locale {
         switch self {
         case .en: Locale(identifier: "en_US")

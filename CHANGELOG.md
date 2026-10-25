@@ -1,5 +1,27 @@
 # Changelog
 
+## 2.9.2
+
+The open-source build catches up with SAVISUL's core, and from now on it is signed with Apple Developer ID and notarized by Apple, so it opens with a double-click. The official SAVISUL, with a Mould account, Mould Cloud, the iPhone app and the assistant, is on [savisul.com](https://www.savisul.com); see [Official SAVISUL or open source](README.md#official-savisul-or-open-source).
+
+### New
+
+- A panda in the island for your AI agents: it shows how they are doing (working, waiting for your answer, done) with a mood of its own and a voice, a squeak, a hum or a yawn, that you can turn off. It has its own switch in Features.
+- An agent waiting for your answer shows it in the island.
+- What's new: after each update SAVISUL says what changed, and Settings → Updates shows it again.
+
+### Better
+
+- The agent monitor hears every turn of a conversation, not only the ones before SAVISUL started, and the panda draws at most 30 times a second and rests while hidden.
+- Notices with buttons stay clickable, and the panda brings everyday news too.
+- The language picker is a set of greetings.
+- Checking an AI key no longer holds up the panel.
+- Updates take builds signed with Apple Developer ID as well as SAVISUL's own certificate.
+
+### Download
+
+[SAVISUL-2.9.2.dmg](https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.9.2.dmg) for macOS 14.2 or later on Apple silicon, signed with Apple Developer ID and notarized. SAVISUL 2.3 and later offer this update by themselves.
+
 ## 2.4
 
 ### New

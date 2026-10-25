@@ -85,5 +85,96 @@ import Testing
 @Test func agentKinds() {
     #expect(AgentKind.claude.title == "Claude Code")
     #expect(AgentKind.codex.short == "Codex")
-    #expect(AgentKind.allCases.count == 5)
+    #expect(AgentKind.mould.title == "Mould Engine Studio")
+    #expect(AgentKind.allCases.count == 6)
+}
+
+@Test func mouldStudioIsReadFromItsActivityFileAndUsageLog() throws {
+    let folder = FileManager.default.temporaryDirectory.appendingPathComponent("mould-reader-\(UUID().uuidString)")
+    try FileManager.default.createDirectory(at: folder.appendingPathComponent("Usage"), withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: folder) }
+    let now = Date()
+    let iso = ISO8601DateFormatter()
+    let month = DateFormatter()
+    month.locale = Locale(identifier: "en_US_POSIX")
+    month.dateFormat = "yyyy-MM"
+    // Two calls today and one two days ago, as Studio's usage log keeps them. Just after midnight the two stay today.
+    let today = Calendar.current.startOfDay(for: now)
+    let rows = [
+        #"{"date":"\#(iso.string(from: max(today, now.addingTimeInterval(-900))))","project":"Site","model":"local:qwen2.5-1.5b","input":400,"output":100,"cost":0,"estimated":true}"#,
+        #"{"date":"\#(iso.string(from: max(today, now.addingTimeInterval(-600))))","project":"Site","model":"deepseek:deepseek-v4-pro","input":1000,"output":200,"cost":0.002,"estimated":false}"#,
+        #"{"date":"\#(iso.string(from: now.addingTimeInterval(-2 * 86_400)))","project":"Site","model":"deepseek:deepseek-v4-pro","input":9000,"output":900,"cost":0.02,"estimated":false}"#,
+    ]
+    try (rows.joined(separator: "\n") + "\n").write(to: folder.appendingPathComponent("Usage/\(month.string(from: now)).jsonl"), atomically: true, encoding: .utf8)
+    func activity(working: Bool, pid: Int32 = getpid(), tokens: Int = 300, waiting: Bool = false) throws {
+        let text = #"{"working":\#(working),"waiting":\#(waiting),"question":"Change index.html (1 edit)","#
+            + #""model":"DeepSeek V4 Pro","modelID":"deepseek:deepseek-v4-pro","project":"Site","projectPath":"/tmp/Site","#
+            + #""task":"Make a landing page","since":"\#(iso.string(from: now.addingTimeInterval(-30)))","tokens":\#(tokens),"#
+            + #""updated":"\#(iso.string(from: now))","pid":\#(pid)}"#
+        try text.write(to: folder.appendingPathComponent("activity.json"), atomically: true, encoding: .utf8)
+    }
+    let reader = MouldReader(support: folder)
+
+    // Idle: today's calls from the log, the last one's model without its provider.
+    var (status, finishes) = reader.scan(now: now, initial: true)
+    #expect(status.installed && !status.working)
+    #expect(status.tokensToday == 1700)
+    // The week holds the call two days ago as well.
+    #expect(status.tokensWeek == 11_600)
+    #expect(abs((status.costToday ?? 0) - 0.002) < 0.000_001)
+    #expect(status.sessionsToday == 2)
+    #expect(status.model == "deepseek-v4-pro")
+
+    // At work: the file's model, project and task, and the call in flight added to the day's tokens.
+    try activity(working: true)
+    (status, finishes) = reader.scan(now: now, initial: false)
+    #expect(status.working)
+    #expect(status.model == "DeepSeek V4 Pro")
+    #expect(status.project == "Site")
+    #expect(status.task == "Make a landing page")
+    #expect(status.tokensToday == 2000)
+    #expect(status.tokensWeek == 11_900)
+    #expect(finishes.isEmpty)
+    #expect(!status.waiting && status.question == nil)
+
+    // A change waiting for the person: the island says so, with what it asks.
+    try activity(working: true, waiting: true)
+    (status, _) = reader.scan(now: now, initial: false)
+    #expect(status.working && status.waiting)
+    #expect(status.question == "Change index.html (1 edit)")
+
+    // Done: one finish, with the project and the task.
+    try activity(working: false, tokens: 0)
+    (status, finishes) = reader.scan(now: now.addingTimeInterval(5), initial: false)
+    #expect(!status.working)
+    #expect(finishes.count == 1 && finishes.first?.kind == .mould && finishes.first?.task == "Make a landing page")
+
+    // A Studio that quit or crashed while the file said it worked isn't at work.
+    try activity(working: true, pid: 999_999)
+    (status, _) = reader.scan(now: now, initial: false)
+    #expect(!status.working)
+}
+
+@Test func aLogTailKeptBetweenScansSeesWhatIsWrittenLater() async throws {
+    let url = FileManager.default.temporaryDirectory.appendingPathComponent("savisul-log-\(UUID().uuidString).jsonl")
+    try Data("{\"turn\":1}\n".utf8).write(to: url)
+    defer { try? FileManager.default.removeItem(at: url) }
+    // As the agents are scanned: one tail per log, kept between scans, on a queue without a run loop, while the agent
+    // goes on writing. A URL's cached size used to hide every line after the first scan.
+    let seen: (first: Int, changed: Bool, later: Int) = await withCheckedContinuation { done in
+        DispatchQueue(label: "test.agents").async {
+            let tail = LogTail(url)
+            let first = tail.read().count
+            if let handle = try? FileHandle(forWritingTo: url) {
+                try? handle.seekToEnd()
+                try? handle.write(contentsOf: Data("{\"turn\":2}\n".utf8))
+                try? handle.close()
+            }
+            let changed = tail.changed()
+            done.resume(returning: (first, changed, tail.read().count))
+        }
+    }
+    #expect(seen.first == 1)
+    #expect(seen.changed)
+    #expect(seen.later == 1)
 }

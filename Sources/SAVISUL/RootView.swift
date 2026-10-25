@@ -53,6 +53,8 @@ struct RootView: View {
         .clipShape(RoundedRectangle(cornerRadius: Metrics.panelRadius, style: .circular))
         .environment(\.colorScheme, .dark)
         .environment(\.wallpaperBehind, wallpaper)
+        // Hidden, the panel is only ordered out: what moves in it holds still until it shows again.
+        .environment(\.motionPaused, !model.panelVisible && !backdrop)
         .animation(.panelSpring, value: model.menuOpen)
         .animation(.panelSpring, value: model.toast)
     }

@@ -18,11 +18,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.4.dmg"><img src="https://img.shields.io/badge/Download-SAVISUL%202.4-DBC7A3?style=for-the-badge&logo=apple&logoColor=DBC7A3&labelColor=17130E" alt="Download SAVISUL 2.4" height="36"></a>
+  <a href="https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.9.2.dmg"><img src="https://img.shields.io/badge/Download-SAVISUL%202.9.2-DBC7A3?style=for-the-badge&logo=apple&logoColor=DBC7A3&labelColor=17130E" alt="Download SAVISUL 2.9.2" height="36"></a>
 </p>
 
 <p align="center">
-  <sub>Free · 12 MB · macOS 14.2 or later on Apple silicon</sub><br>
+  <sub>Free · 11 MB · macOS 14.2 or later on Apple silicon</sub><br>
   <a href="https://www.savisul.com">Website</a>
   &nbsp;·&nbsp;
   <a href="#keyboard-shortcuts">Shortcuts</a>
@@ -38,7 +38,7 @@
 
 <table>
   <tr>
-    <td width="25%" valign="top"><b>Native and light</b><br>Swift, SwiftUI and AppKit. A 12 MB download, no Electron.</td>
+    <td width="25%" valign="top"><b>Native and light</b><br>Swift, SwiftUI and AppKit. An 11 MB download, no Electron.</td>
     <td width="25%" valign="top"><b>Private by default</b><br>No account, no analytics, no telemetry.</td>
     <td width="25%" valign="top"><b>Your AI, your keys</b><br>Eight providers, any OpenAI-compatible server or a local model.</td>
     <td width="25%" valign="top"><b>Four languages</b><br>English, Russian, Ukrainian and French.</td>
@@ -46,6 +46,21 @@
 </table>
 
 SAVISUL replaces a pile of small utilities with one system: an island in the notch, actions for whatever you select, a command bar, clipboard history, window snapping, per-app sound, automations and AI on your own keys — sharing one actions engine, built natively for macOS.
+
+## Official SAVISUL or open source
+
+SAVISUL comes in two builds. Both are free, and both are signed with Apple Developer ID and notarized by Apple, so they open like any other app.
+
+| | [Official SAVISUL](https://www.savisul.com) | Open-source SAVISUL (this repository) |
+|---|---|---|
+| Where to get it | [savisul.com](https://www.savisul.com) | [Releases](https://github.com/mouldloft/SAVISUL/releases/latest) |
+| The island, panel, command bar, clipboard, Shelf, windows, sound, automations, AI actions on your own keys, browser extension | Yes | Yes |
+| A Mould account: Mould Cloud sync and SAVISUL Mobile on the iPhone | Yes | No |
+| The assistant (<kbd>⌃</kbd> <kbd>⌥</kbd> <kbd>H</kbd>) with models on your Mac, photo search by meaning | Yes | No |
+| Source code | The core is this repository; the assistant's engine and Mould Cloud are Mould Loft's own | All of it, here |
+| Updates | From savisul.com | From this repository's releases |
+
+Want to connect your Mac to a Mould account, sync with the iPhone, or use the assistant? Download the official SAVISUL from [savisul.com](https://www.savisul.com). Want to read the code, change it or build it yourself? This repository is the open-source SAVISUL: everything in it builds into the app on the right.
 
 ## The island
 
@@ -239,35 +254,11 @@ SAVISUL is built around a unified Actions Engine. Every action describes its inp
 
 ### Download
 
-SAVISUL runs on macOS 14.2 or later on a Mac with Apple silicon.
+SAVISUL runs on macOS 14.2 or later on a Mac with Apple silicon. This repository's releases are the open-source build; the official one, with a Mould account and the assistant, is on [savisul.com](https://www.savisul.com) (see [Official SAVISUL or open source](#official-savisul-or-open-source)).
 
-> [!NOTE]
-> SAVISUL isn't signed with an Apple Developer ID or notarized by Apple yet, so macOS blocks it the first time you open it. One line in Terminal fixes that, once. A signed and notarized build is coming soon; then SAVISUL will open with a double-click like any other app.
-
-<p align="center">
-  <img src="docs/readme/install.gif" alt="Installing SAVISUL in four steps: download the disk image from Releases, drag SAVISUL into Applications, paste one line into Terminal after macOS blocks the first launch, then open SAVISUL" width="880">
-</p>
-
-1. Download [SAVISUL-2.3.dmg](https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.3.dmg) from [Releases](https://github.com/mouldloft/SAVISUL/releases/latest) or the [website](https://www.savisul.com).
-2. Open the disk image and drag **SAVISUL** into **Applications** in the Finder sidebar.
-3. Open **Terminal**: press <kbd>⌘</kbd> <kbd>Space</kbd>, type `Terminal` and press <kbd>Return</kbd>. Paste this line and press <kbd>Return</kbd>:
-
-   ```sh
-   xattr -cr /Applications/SAVISUL.app
-   ```
-
-   It removes the "downloaded from the internet" flag that makes macOS refuse apps it hasn't checked. When it works, it prints nothing.
-4. Open SAVISUL from Applications. Grant only the permissions required by the features you use.
-
-<details>
-<summary>Other ways past the warning</summary>
-
-- Right after macOS refuses to open SAVISUL, open **System Settings → Privacy & Security**, click **Open Anyway** and confirm with your password.
-- [If it won't open.txt](site/download/If%20it%20won't%20open.txt) holds a longer Terminal script: it finds the disk image in Downloads, copies SAVISUL into Applications, clears the flag and opens it.
-
-The disk image also holds **Установить SAVISUL.command** and **Если не открывается.txt**, the Russian versions of that helper and script. macOS blocks the helper the same way it blocks the app, so use the Terminal line instead.
-
-</details>
+1. Download [SAVISUL-2.9.2.dmg](https://github.com/mouldloft/SAVISUL/releases/latest/download/SAVISUL-2.9.2.dmg) from [Releases](https://github.com/mouldloft/SAVISUL/releases/latest).
+2. Open the disk image and drag **SAVISUL** into **Applications**.
+3. Open SAVISUL from Applications. It is signed with Apple Developer ID and notarized by Apple, so it opens with a double-click like any other app. Grant only the permissions the features you use need.
 
 After that SAVISUL updates itself: when a new version is out it offers it on the island and in **Settings → Updates**, installs it in place and keeps its permissions.
 
@@ -288,7 +279,6 @@ The browser extension lives in `Extension/`. SAVISUL copies it out of the app: i
 | `Sources/SAVISUL` | The Mac app: Swift, SwiftUI and AppKit |
 | `Sources/MediaBridge`, `Sources/FanHelper`, `Sources/SMCBridge` | The Now Playing bridge, the fan helper and the sensor reader |
 | `Extension` | The browser extension |
-| `site` | The website |
 | `Tests` | Unit tests |
 | `scripts` | Build, test and packaging scripts |
 
@@ -374,7 +364,14 @@ No. iPhone Face ID has a 3D infrared camera; a Mac has an ordinary one, so a goo
 <details>
 <summary><b>Why does macOS say the app can't be opened?</b></summary>
 
-SAVISUL isn't notarized by Apple yet. Paste `xattr -cr /Applications/SAVISUL.app` into Terminal once, as [Installation](#installation) shows. A signed and notarized build is coming soon.
+Builds from 2.9.2 on are signed with Apple Developer ID and notarized, so macOS opens them at once. An older build, from before that, needs `xattr -cr /Applications/SAVISUL.app` in Terminal once; better, download the current one from [Releases](https://github.com/mouldloft/SAVISUL/releases/latest).
+
+</details>
+
+<details>
+<summary><b>Where are the Mould account, Mould Cloud and the assistant?</b></summary>
+
+In the official SAVISUL from [savisul.com](https://www.savisul.com). They depend on Mould Loft's servers and its assistant engine, which aren't open source, so the build from this repository leaves them out; everything else is the same app.
 
 </details>
 
